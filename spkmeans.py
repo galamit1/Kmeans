@@ -1,6 +1,8 @@
 import sys
 
 from python_goal_implementations.wam import wam_run
+from python_goal_implementations.ddg import ddg_run
+from python_goal_implementations.lnorm import lnorm_run
 
 POINTS_SEPARATOR = '\n'
 COORDINATES_SEPARATOR = ','
@@ -29,8 +31,15 @@ def main():
     result = []
     if goal == "spk":
         pass
-    if goal == "wam":
-        result = wam_run(points)
+    elif goal == "wam":
+        result = wam_run(points).tolist()
+    elif goal == "ddg":
+        result = ddg_run(points).tolist()
+    elif goal == "lnorm":
+        result = lnorm_run(points).tolist()  # we get identity matrix because D*W == zeros !!!
+    else:
+        print("Invalid goal")
+        return
 
     output = POINTS_SEPARATOR.join(
         [COORDINATES_SEPARATOR.join(["{:.4f}".format(round(i, 4)) for i in c]) for c in result])
