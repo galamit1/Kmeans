@@ -8,6 +8,7 @@ typedef struct Cluster {
     double* sum;
 } Cluster;
 
+int spk_run(double **points, int k, int num_points, int num_coordinates);
 int get_num_coordinates(char* sinlge_line);
 double* convert_line_to_point (double* point, char* line);
 Cluster* make_cluster (const double* point, const int num_coordinates, const int index);
