@@ -1,3 +1,4 @@
+#include "spkmeans.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -21,6 +22,11 @@ int main(int argc, char **argv) {
     /***Variables declarations***/
     int k;
     char goal[7];
+    char file_path[100];
+    size_t read;
+    size_t len;
+    char * line;
+
     /***enum Goal {SPK="spk", WAM="wam", DDG="ddg", LNORM="lnorm", JACOBI="jacobi"} goal_types;***/
     int num_points;
     int num_coordinates;
@@ -33,6 +39,7 @@ int main(int argc, char **argv) {
     int j;
     int run = 0;
 
+
     /***Input validation***/
     if (argc != 4) {
         printf("Invalid input: number of parameters should be 3.");
@@ -41,13 +48,15 @@ int main(int argc, char **argv) {
 
     sscanf(argv[1], "%d", &k);
     sscanf(argv[2], "%s", &goal);
+    sscanf(argv[3], "%s", &file_path);
 
     if (k <= 0) {
         printf("Invalid input: k should be > 0");
         exit(0);
     }
 
-    if (stdin == NULL) {
+    FILE * file = fopen(file_path, "r");
+    if (file == NULL) {
         printf ("Couldn't open file");
         exit(0);
     }
@@ -81,7 +90,7 @@ int main(int argc, char **argv) {
 
     /***Run the function according do the goal***/
     if (strcmp(goal, "spk")) {
-        spk_run(points, k, num_coordinates);
+        spk_run(points, k, num_points, num_coordinates);
         run = 1;
     }
     if (run == 0) {

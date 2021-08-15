@@ -10,14 +10,7 @@
 #include <string.h>
 
 #define EPSILON 0.001
-
-typedef struct Cluster {
-    int cluster_size;
-    int cluster_index;
-    double* prev_centroids;
-    double* curr_centroids;
-    double* sum;
-} Cluster;
+#define MAX_ITER 500
 
 
 
@@ -25,11 +18,10 @@ typedef struct Cluster {
 /*** Main Function ***/
 /*******************************/
 
-int spk_run(double **points, int k, int num_coordinates) {
+int spk_run(double **points, int k, int num_points, int num_coordinates) {
     /*argc = number of parameters (including program name), **argv = string array of parameters.*/
 
     /***Variables declarations***/
-    double **points;
     double *point;
     Cluster **clusters;
     int did_update;
@@ -41,7 +33,7 @@ int spk_run(double **points, int k, int num_coordinates) {
     clusters = init_k_clusters(points, k, num_coordinates);
     did_update = 0;
 
-    for (i=0; i<max_iter; i++) {
+    for (i=0; i<MAX_ITER; i++) {
         for (j=0; j<num_points; j++) {
             point = points[j];
             find_minimum_distance(clusters, point, k, num_coordinates);
@@ -75,66 +67,66 @@ int spk_run(double **points, int k, int num_coordinates) {
 /*******************************/
 
 
-int get_num_coordinates(char* sinlge_line) {
-    /*
-    Recieves pointer to char array containing the first line (=point),
-    Returns number of coordinates in each point (we can assume all points have same amount of coordinates).
-    */
-    int count_coordinates = 1;
-    char* pointer = sinlge_line;
-
-    while ((pointer = strchr(pointer, ',')) != NULL) {
-        pointer++;
-        count_coordinates++;
-    }
-
-    return count_coordinates;
-}
-
-
-double** init_points (int num_points, int num_coordinates) {
-    /*
-   Recieves number of points and number of coordinates,
-   Returns new 2D array of points with sufficient memory to store all points.
-   */
-    double** points;
-    int i;
-
-    /*allocate memory for 2D array of points*/
-    points = (double**)malloc(sizeof(double*) * num_points);
-    assert(points != NULL);
-    for (i=0; i< num_points; i++) {
-        points[i] = (double*)malloc(sizeof(double) * num_coordinates);
-        assert(points[i] != NULL);
-    }
-
-    return points;
-}
-
-
-double* convert_line_to_point (double* point, char* line) {
-    /*
-   Recieves pointer to char array containing a line (=point) and pointer to initialized double-array (=point),
-   Returns the same point after filling it with double values from the line, using string.h functio strtok.
-   Reference: https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
-   */
-    char* tokens;
-    int index;
-
-    index = 0;
-
-    tokens = strtok(line, ",");
-
-    while (tokens != NULL) {
-        point[index] = atof(tokens);
-        tokens = strtok(NULL, ",");
-        index++;
-    }
-
-    return point;
-}
-
-
+//int get_num_coordinates(char* sinlge_line) {
+//    /*
+//    Recieves pointer to char array containing the first line (=point),
+//    Returns number of coordinates in each point (we can assume all points have same amount of coordinates).
+//    */
+//    int count_coordinates = 1;
+//    char* pointer = sinlge_line;
+//
+//    while ((pointer = strchr(pointer, ',')) != NULL) {
+//        pointer++;
+//        count_coordinates++;
+//    }
+//
+//    return count_coordinates;
+//}
+//
+//
+//double** init_points (int num_points, int num_coordinates) {
+//    /*
+//   Recieves number of points and number of coordinates,
+//   Returns new 2D array of points with sufficient memory to store all points.
+//   */
+//    double** points;
+//    int i;
+//
+//    /*allocate memory for 2D array of points*/
+//    points = (double**)malloc(sizeof(double*) * num_points);
+//    assert(points != NULL);
+//    for (i=0; i< num_points; i++) {
+//        points[i] = (double*)malloc(sizeof(double) * num_coordinates);
+//        assert(points[i] != NULL);
+//    }
+//
+//    return points;
+//}
+//
+//
+//double* convert_line_to_point (double* point, char* line) {
+//    /*
+//   Recieves pointer to char array containing a line (=point) and pointer to initialized double-array (=point),
+//   Returns the same point after filling it with double values from the line, using string.h functio strtok.
+//   Reference: https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
+//   */
+//    char* tokens;
+//    int index;
+//
+//    index = 0;
+//
+//    tokens = strtok(line, ",");
+//
+//    while (tokens != NULL) {
+//        point[index] = atof(tokens);
+//        tokens = strtok(NULL, ",");
+//        index++;
+//    }
+//
+//    return point;
+//}
+//
+//
 
 Cluster* make_cluster (const double* point, const int num_coordinates,const int index) {
     /*
