@@ -12,6 +12,7 @@
 typedef struct Matrix {
     double** cells;
     int order;
+    //add rows & cols instead of order
 } Matrix ;
 
 typedef struct Cell {
@@ -21,6 +22,7 @@ typedef struct Cell {
 } Cell;
 
 /*TODO: implement iterative getEigenVectors function (with limit 0f 100 iterations), which should include getEigenValues function*/
+/*TODO: utils functions to separate file*/
 
 /*Preform pivot from A to A' according to input A,c,s,i,j and free memory of A*/
 Matrix* preformPivotStepAndFreeMemory (Matrix* A, int i, int j, double c, double s) {

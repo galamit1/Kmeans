@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
 
     /***Input validation***/
     if (argc != 4) {
-        printf("Invalid input: number of parameters should be 3.");
+        printf("Invalid input: number of parameters should be 3."); //TODO: print generic error msg
         exit(0);
     }
 
@@ -51,13 +51,13 @@ int main(int argc, char **argv) {
     sscanf(argv[3], "%s", &file_path);
 
     if (k <= 0) {
-        printf("Invalid input: k should be > 0");
+        printf("Invalid input: k should be > 0"); //TODO: print generic error msg
         exit(0);
     }
 
     FILE * file = fopen(file_path, "r");
-    if (file == NULL) {
-        printf ("Couldn't open file");
+    if (stdin == NULL) {
+        printf ("Couldn't open file"); //TODO: print generic error msg
         exit(0);
     }
 
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
     rewind(stdin); /*Reset pointer to head of file*/
 
     if (k > num_points) {
-        printf ("Invalid input: more clusters than points");
+        printf ("Invalid input: more clusters than points"); //TODO: print generic error msg
         exit(0);
     }
 
