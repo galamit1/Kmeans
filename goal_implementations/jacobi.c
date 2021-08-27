@@ -17,10 +17,10 @@ Matrix* preformPivotStepAndFreeMemory (Matrix* A, int i, int j, double c, double
     Matrix* newA;
     int r;
 
-    newA = getZerosMatrixSizeN(A -> order);
+    newA = getZerosMatrixSizeN(A -> rows);
 
     /*iterate only on rows i,j and columns i,j */
-    for (r=0; r < A -> order; r++) {
+    for (r=0; r < A -> rows; r++) {
         newA -> cells[r][i] = (c * A -> cells[r][i]) - (s * A -> cells[r][j]);
         newA -> cells[r][j] = (c * A -> cells[r][j]) + (s *  A -> cells[r][i]);
     }
@@ -42,8 +42,8 @@ double getOffDiagonalSumOfMatrix (Matrix* m) {
     double sum = 0.0;
 
     /*calculte sum of squares of all elements above diagonal*/
-    for (i=0; i < m -> order; i++) {
-        for (j=i+1; j < m -> order; j++) {
+    for (i=0; i < m -> rows; i++) {
+        for (j=i+1; j < m -> rows; j++) {
             sum += pow(m -> cells[i][j], 2);
         }
     }
@@ -62,7 +62,7 @@ Matrix* getRotationMatrixForM (Matrix* m) {
     double theta,t,c,s;
 
     /*start with identity matrix*/
-    rotationMatrix = getIdentitiyMatrixSizeN(m -> order);
+    rotationMatrix = getIdentitiyMatrixSizeN(m -> rows);
     
     /*calculte theta,t,c,s according to formula*/
     largestNonDiagonalCell = getIdentitiyMatrixSizeN(m);

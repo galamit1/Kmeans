@@ -1,10 +1,6 @@
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "./utils.h"
 
-#define LINE_SIZE 1000 /*Given assumption each line is no more than 1000 characters*/
+#define LINE_SIZE 1001 /*Given assumption each line is no more than 1000 characters*/
 
 /**********************/
 /**TESTING ONLY - DON'T FORGET TO REMOVE**/
@@ -13,38 +9,61 @@
 int main () {
     int numPoints, numCoordinates;
     FILE* fptr;
+    double **points;
+    int i,j;
+    Matrix* m;
 
-    fptr = fopen("example.txt", "r");
+    points = get_points("./example.txt");
+
+    fptr = fopen("./example.txt", "r");
+    assert(fptr != NULL);
     numPoints = getNumPoints(fptr);
     numCoordinates = getNumCoordinates(fptr);
 
-    printf("Number of points is: %d, Number of coordinates is: %d", numPoints, numCoordinates);
+    m = getMatrixFrom2DArray(points, numPoints, numCoordinates);
+
+    printMatrix(m);
 
     return 0;
 }
 
 
-/**********************/
-/**STRUCT DEFINITIONS**/
-/**********************/
-
-typedef struct Matrix {
-    double** cells;
-    int order;
-    //add rows & cols instead of order
-} Matrix ;
-
-typedef struct Cell {
-    int row;
-    int col;
-    double value;
-} Cell;
 
 /**********************/
 /**MATRIX UTILS**/
 /**********************/
 
-/*Allocates memory and returns n*n zeros matrix*/
+/*Recieves 2D array of doubles and its dimentions, returns Matrix with same content, including memory allocation (for Matrix pointer only - not for Matrix contents)*/
+Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates) {
+    Matrix* output;
+    int i;
+
+    /*allocate memory*/
+    output = (Matrix*)malloc(sizeof(Matrix));
+    assert (output != NULL); //TODO: add printf off error message
+    /*initialize parameters, including n*n matrix with memory*/
+    output -> rows = numPoints;
+    output -> cols = numCoordinates;
+    output -> cells = points;
+
+    return output;
+}
+
+/*Receives Matrix and prints it*/
+void printMatrix (Matrix* m) {
+    double** cells;
+    int i,j;
+
+    printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
+    for (i=0; i < m -> rows; i++) {
+        for (j=0; j < m -> cols; j++) {
+             printf("%f,", m -> cells[i][j]);
+         }
+         printf("\n");
+     }
+}
+
+/*Allocates memory and returns n*n zeros matrix, including memory allocation*/
 Matrix* getZerosMatrixSizeN (int n) {
     int i;
     Matrix* zerosMatrix;
@@ -53,7 +72,8 @@ Matrix* getZerosMatrixSizeN (int n) {
     zerosMatrix = malloc(sizeof(Matrix));
     assert (zerosMatrix != NULL); //TODO: add printf off error message
     /*initialize parameters, including n*n matrix with memory*/
-    zerosMatrix -> order = n;
+    zerosMatrix -> rows = n;
+    zerosMatrix -> cols = n;
     zerosMatrix -> cells = calloc(n, sizeof(double*));
     for (i=0; i < n; i++) {
         zerosMatrix -> cells[i] = calloc(n, sizeof(double));
@@ -92,8 +112,8 @@ Cell* getCellWithLargestValue (Matrix* m) {
     largestCell -> value = -INFINITY;
 
     /*find largest absolute value and update largestCell accordingly*/
-    for (i=0; i < m -> order; i++) {
-        for (j=i+1; j < m -> order; j++) {
+    for (i=0; i < m -> rows; i++) {
+        for (j=i+1; j < m -> cols; j++) {
             currAbsoluteValue = abs(m -> cells[i][j]);
             if (currAbsoluteValue > largestCell -> value) {
                 largestCell -> row = i;
@@ -110,8 +130,8 @@ Cell* getCellWithLargestValue (Matrix* m) {
 int isDiagonalMatrix (Matrix* m) {
     int i,j;
     //check if there's a non-zero element above diagonal
-    for (i=0; i < m -> order; i++) {
-        for (j=i+1; j < m -> order; j++) {
+    for (i=0; i < m -> rows; i++) {
+        for (j=i+1; j < m -> cols; j++) {
             if (m -> cells[i][j] != 0)
                 return 0;
         }
@@ -131,13 +151,13 @@ Matrix* multiplyMatricesAndFreeMemory (Matrix* m1, Matrix* m2) {
     Matrix* product;
     int i,j, k;
 
-    product = getZerosMatrixSizeN(m1 -> order);
+    product = getZerosMatrixSizeN(m1 -> rows);
 
     /*TODO: can we improve this multilpication without making it too complicated?*/
     /*preform regular matrix multiplication - store result in product*/
-    for (i=0; i < product -> order; i++) {
-        for (j=0; j < product -> order; j++) {
-            for (k=0; k < product -> order; k++) {
+    for (i=0; i < product -> rows; i++) {
+        for (j=0; j < product -> rows; j++) {
+            for (k=0; k < product -> rows; k++) {
                 product -> cells[i][j] += (m1 -> cells[i][k])*(m2 -> cells[k][j]);
             }
         }
@@ -152,7 +172,7 @@ Matrix* multiplyMatricesAndFreeMemory (Matrix* m1, Matrix* m2) {
 
 /*Recieves symmetric matrix and frees its memory*/
 void freeMatrixMemory (Matrix* m) {
-    int n = m -> order;
+    int n = m -> rows;
     int i;
 
     for (i=0; i < n; i++) {
@@ -169,7 +189,7 @@ int getNumPoints(FILE *fptr) {
     int countPoints = 1;
     char ch;
 
-    while (ch = fgetc(fptr) != EOF) {
+    while ((ch = fgetc(fptr)) != EOF) {
         if (ch == '\n') {
             countPoints++;
         }
@@ -182,7 +202,7 @@ int getNumPoints(FILE *fptr) {
 int getNumCoordinates(FILE *fptr) {
     int countCoordinates = 1;
     char ch;
-    while (ch = fgetc(fptr) != '\n') {
+    while ((ch = fgetc(fptr)) != '\n') {
         if (ch == ',') {
             countCoordinates++;
         }
@@ -223,14 +243,14 @@ void singleLineToPoint (double* point, char* singleLine) {
     }
 }
 
-/*Receives path to file and returns 2D matrix with all points, including memory allocation*/
+/*Receives path to file and returns 2D matrix with all points, including memory allocation and closing the pointer*/
 double** get_points (char *path) {
     FILE *fptr;
     double** points;
     int numPoints, numCoordinates;
     int i;
-
-    fptr = fopen(path,"r");
+    
+    fptr = fopen(path, "r");
     if (fptr != NULL) {
         numPoints = getNumPoints(fptr);
         numCoordinates = getNumCoordinates(fptr);
