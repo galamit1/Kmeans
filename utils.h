@@ -1,3 +1,6 @@
+#ifndef SPK_SPKMEANSMODULE_H
+#define SPK_SPKMEANSMODULE_H
+
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -39,3 +42,5 @@ int getNumPoints(FILE *fptr);
 int getNumCoordinates(FILE *fptr);
 void getPointsFromFile (int numPoints, int numCoordinates, FILE *fptr, double** points);
 void singleLineToPoint (double* point, char* singleLine);
+
+#endif //SPK_SPKMEANSMODULE_H

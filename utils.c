@@ -6,26 +6,26 @@
 /**TESTING ONLY - DON'T FORGET TO REMOVE**/
 /**********************/
 
-int main () {
-    int numPoints, numCoordinates;
-    FILE* file_ptr;
-    double ** points;
-    int i,j;
-    Matrix* points_matrix;
+// int main () {
+//     int numPoints, numCoordinates;
+//     FILE* file_ptr;
+//     double ** points;
+//     int i,j;
+//     Matrix* points_matrix;
 
-    points = get_points("./example.txt");
+//     points = get_points("./example.txt");
 
-    file_ptr = fopen_s("./example.txt", "r");
-    assert(file_ptr != NULL);
-    numPoints = getNumPoints(file_ptr);
-    numCoordinates = getNumCoordinates(file_ptr);
+//     file_ptr = fopen("./example.txt", "r");
+//     assert(file_ptr != NULL);
+//     numPoints = getNumPoints(file_ptr);
+//     numCoordinates = getNumCoordinates(file_ptr);
 
-    points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
+//     points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
 
-    printMatrix(points_matrix);
+//     printMatrix(points_matrix);
 
-    return 0;
-}
+//     return 0;
+// }
 
 
 
@@ -83,7 +83,7 @@ Matrix* getZerosMatrixSizeN (int n) {
     return zerosMatrix;
 }
 
-/*Allocates mempry and returns n*n identity matrix*/
+/*Allocates memory and returns n*n identity matrix*/
 Matrix* getIdentitiyMatrixSizeN (int n) {
     int i;
     Matrix* identity;

@@ -8,9 +8,67 @@
 #include <math.h>
 
 
-#define EPSILON 0.001
+#define EPSILON 1.0e-15
 
-/*TODO: implement iterative getEigenVectors function (with limit 0f 100 iterations), which should include getEigenValues function*/
+/*TODO: implement iterative getEigenVectors function (with limit of 100 iterations), which should include getEigenValues function*/
+
+int getEigenGapK (double* eigenValusArray) {
+    double max_gap;
+    int max_index;
+    int current_index;
+    
+}
+
+Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigenValusArray) {
+    Matrix* current_A_matrix;
+    Matrix* v_matrix;
+    Matrix* current_P_matrix;
+    double a_current_off, a_previous_off;
+    int num_iterations, i, j;
+    double theta,t,c,s;
+    Cell* largestNonDiagonalCell;
+
+    /*Start with input matrix as A*/
+    current_A_matrix = originalMatrix;
+    /*Initialize V to be identity matrix - agnostic to matrix multiplication*/
+    v_matrix = getIdentitiyMatrixSizeN(originalMatrix -> rows);
+
+    a_previous_off = INFINITY*(-1);
+    a_current_off = getOffDiagonalSumOfMatrix(current_A_matrix);
+    num_iterations = 0;
+
+    while ((num_iterations < 100) && (a_current_off - a_previous_off <= EPSILON)) {
+        /*calculte theta,t,c,s according to formula*/
+        largestNonDiagonalCell = getCellWithLargestValue(current_A_matrix);
+        i = largestNonDiagonalCell -> row;
+        j = largestNonDiagonalCell -> col;
+        theta = (current_A_matrix -> cells[j][j] - current_A_matrix -> cells[i][i]) / (2 * current_A_matrix -> cells[i][j]);
+        t = sign(theta) / (abs(theta) + sqrt(pow(theta,2) + 1));
+        c = 1 / (sqrt(pow(t,2) + 1));
+        s = t * c;
+
+        /*Get P matrix according to c & s*/
+        current_P_matrix = getRotationMatrixForM(current_A_matrix, largestNonDiagonalCell, c, s);
+
+        /*Update V according to current P*/
+        v_matrix = multiplyMatricesAndFreeMemory(v_matrix, current_P_matrix);
+        
+        /*Preform pivot step from A to A' and update Off values*/
+        current_A_matrix = preformPivotStepAndFreeMemory(current_A_matrix, i, j, c, s);
+        a_previous_off = a_current_off;
+        a_current_off = getOffDiagonalSumOfMatrix(current_A_matrix);
+
+        num_iterations++;
+    }
+
+    /*Update the eigenValues in array in-place*/
+    for (i=0; i < current_A_matrix -> rows; i++) {
+        eigenValusArray[i] = current_A_matrix -> cells[i][i];
+    }
+
+    return v_matrix;
+
+}   
 
 /*Preform pivot from A to A' according to input A,c,s,i,j and free memory of A*/
 Matrix* preformPivotStepAndFreeMemory (Matrix* A, int i, int j, double c, double s) {
@@ -55,23 +113,15 @@ double getOffDiagonalSumOfMatrix (Matrix* m) {
 }
 
 /*Recieves symmetric matrix m and returns rotation matrix for m*/
-Matrix* getRotationMatrixForM (Matrix* m) {
+Matrix* getRotationMatrixForM (Matrix* m, Cell* largestNonDiagonalCell, double c, double s) {
     Matrix* rotationMatrix;
-    Cell* largestNonDiagonalCell;
     int i,j;
-    double theta,t,c,s;
 
     /*start with identity matrix*/
     rotationMatrix = getIdentitiyMatrixSizeN(m -> rows);
-    
-    /*calculte theta,t,c,s according to formula*/
-    largestNonDiagonalCell = getIdentitiyMatrixSizeN(m);
+
     i = largestNonDiagonalCell -> row;
     j = largestNonDiagonalCell -> col;
-    theta = (m -> cells[j][j] - m -> cells[i][i]) / (2 * m -> cells[i][j]);
-    t = sign(theta) / (abs(theta) + sqrt(pow(theta,2) + 1));
-    c = 1 / (sqrt(pow(t,2) + 1));
-    s = t * c;
     
     /*set correlating cells to c, s  & -s*/
     rotationMatrix -> cells[i][i] = c;
