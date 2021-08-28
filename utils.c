@@ -8,21 +8,21 @@
 
 int main () {
     int numPoints, numCoordinates;
-    FILE* fptr;
-    double **points;
+    FILE* file_ptr;
+    double ** points;
     int i,j;
-    Matrix* m;
+    Matrix* points_matrix;
 
     points = get_points("./example.txt");
 
-    fptr = fopen("./example.txt", "r");
-    assert(fptr != NULL);
-    numPoints = getNumPoints(fptr);
-    numCoordinates = getNumCoordinates(fptr);
+    file_ptr = fopen_s("./example.txt", "r");
+    assert(file_ptr != NULL);
+    numPoints = getNumPoints(file_ptr);
+    numCoordinates = getNumCoordinates(file_ptr);
 
-    m = getMatrixFrom2DArray(points, numPoints, numCoordinates);
+    points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
 
-    printMatrix(m);
+    printMatrix(points_matrix);
 
     return 0;
 }
@@ -185,47 +185,47 @@ void freeMatrixMemory (Matrix* m) {
 /**********************/
 
 /*Recieves file pointer and returns number of points == number of lines in file*/
-int getNumPoints(FILE *fptr) {
+int getNumPoints(FILE *file_ptr) {
     int countPoints = 1;
     char ch;
 
-    while ((ch = fgetc(fptr)) != EOF) {
+    while ((ch = fgetc(file_ptr)) != EOF) {
         if (ch == '\n') {
             countPoints++;
         }
     }
-    rewind(fptr);
+    rewind(file_ptr);
     return countPoints;
 }
 
 /*Recieves file pointer and returns number of coordinates in each line*/
-int getNumCoordinates(FILE *fptr) {
+int getNumCoordinates(FILE *file_ptr) {
     int countCoordinates = 1;
     char ch;
-    while ((ch = fgetc(fptr)) != '\n') {
+    while ((ch = fgetc(file_ptr)) != '\n') {
         if (ch == ',') {
             countCoordinates++;
         }
     }
-    rewind(fptr);
+    rewind(file_ptr);
     return countCoordinates;
 }
 
 /*Recieves number of points & coordinates along with FILE pointer and empty 2D points array, fills array with points from file*/
-void getPointsFromFile (int numPoints, int numCoordinates, FILE *fptr, double** points) {
+void getPointsFromFile (int numPoints, int numCoordinates, FILE *file_ptr, double** points) {
     int currentLine;
     char singleLine[LINE_SIZE];
     char* token;
 
     currentLine = 0;
     /*verify file is non-empty - we have assumption that it's not*/
-    assert(fgets(singleLine, LINE_SIZE, fptr) != NULL);
+    assert(fgets(singleLine, LINE_SIZE, file_ptr) != NULL);
     /*already read first line so use do-while*/
     do {
        singleLineToPoint(points[currentLine], singleLine);
         currentLine++;
     }  
-    while (fgets(singleLine, LINE_SIZE, fptr) != NULL); 
+    while (fgets(singleLine, LINE_SIZE, file_ptr) != NULL); 
 }
 
 /*Recieves pointer to single point and single line (as string), inserts coordinates (as double) to point*/
@@ -245,15 +245,15 @@ void singleLineToPoint (double* point, char* singleLine) {
 
 /*Receives path to file and returns 2D matrix with all points, including memory allocation and closing the pointer*/
 double** get_points (char *path) {
-    FILE *fptr;
+    FILE *file_ptr;
     double** points;
     int numPoints, numCoordinates;
     int i;
     
-    fptr = fopen(path, "r");
-    if (fptr != NULL) {
-        numPoints = getNumPoints(fptr);
-        numCoordinates = getNumCoordinates(fptr);
+    file_ptr = fopen(path, "r");
+    if (file_ptr != NULL) {
+        numPoints = getNumPoints(file_ptr);
+        numCoordinates = getNumCoordinates(file_ptr);
 
         //Allocate memory for 2D-array
         points = (double**)malloc(numPoints * sizeof(double*));
@@ -263,10 +263,10 @@ double** get_points (char *path) {
         }
 
     /*Fill array with parsed values from files*/
-    getPointsFromFile(numPoints , numCoordinates , fptr , points);
+    getPointsFromFile(numPoints , numCoordinates , file_ptr , points);
     }
 
-    fclose(fptr);
+    fclose(file_ptr);
     
     return points;
 }

@@ -1,15 +1,4 @@
 #include "spkmeans.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <string.h>
-
-
-#include "goal_implementations/spk.h"
-/***#include "goal_implementations/wam.h"
-#include "goal_implementations/ddg.h"
-#include "goal_implementations/lnorm.h"
-#include "goal_implementations/jacobi.h"***/
 
 
 /*******************************/
@@ -17,12 +6,70 @@
 /*******************************/
 
 int main(int argc, char **argv) {
+    int k;
+    char goal[7];
+    char filePath[100];
+    
+    int numPoints, numCoordinates;
+    FILE * file_ptr;
+    errno_t err;
+    double ** points;
+    int i,j;
+    Matrix * points_matrix;
+
+    int run = 0;
+
+    if (argc != 4) {
+        printf("Invalid Input!");
+        exit(1);
+    }
+    sscanf(argv[1], "%d", &k);
+    sscanf(argv[2], "%s", &goal);
+    sscanf(argv[3], "%s", &filePath);
+
+    if (k <= 0) {
+        printf("Invalid Input!");
+        exit(1);
+    }
+    
+    points = get_points(filePath);
+
+    numPoints = getNumPoints(file_ptr);
+    numCoordinates = getNumCoordinates(file_ptr);
+
+    points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
+
+    if (k >= numPoints) { //TODO > or >=?
+        freeMatrixMemory(points_matrix);
+        exit(1);
+    }
+
+    /***Run the function according do the goal***/
+    if (strcmp(goal, "wam")) {
+        Matrix * wam_matrix = run_wam(points_matrix);
+        printMatrix(wam_matrix);
+        freeMatrixMemory(wam_matrix);
+        freeMatrixMemory(points_matrix);
+        exit(0);
+    }
+    if (run == 0) {
+        printf("Invalid input: goal is not in of the options");
+    }
+
+    /***clean all***/
+    freeMatrixMemory(points_matrix);
+}
+
+
+
+
+int main1(int argc, char **argv) {
     /*argc = number of parameters (including program name), **argv = string array of parameters.*/
 
     /***Variables declarations***/
     int k;
     char goal[7];
-    char file_path[100];
+    char filePath[100];
     size_t read;
     size_t len;
     char * line;
@@ -48,14 +95,14 @@ int main(int argc, char **argv) {
 
     sscanf(argv[1], "%d", &k);
     sscanf(argv[2], "%s", &goal);
-    sscanf(argv[3], "%s", &file_path);
+    sscanf(argv[3], "%s", &filePath);
 
     if (k <= 0) {
         printf("Invalid input: k should be > 0"); //TODO: print generic error msg
         exit(0);
     }
 
-    FILE * file = fopen(file_path, "r");
+    FILE * file = fopen(filePath, "r");
     if (stdin == NULL) {
         printf ("Couldn't open file"); //TODO: print generic error msg
         exit(0);
@@ -94,7 +141,7 @@ int main(int argc, char **argv) {
         run = 1;
     }
     if (run == 0) {
-        printf("Invalid input: goal is not ine of the options");
+        printf("Invalid input: goal is not in of the options");
     }
 
 

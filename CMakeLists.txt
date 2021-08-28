@@ -1,3 +1,5 @@
 PROJECT(SPK)
 add_subdirectory(goal_implementations)
-add_executable (spk spkmeans.c spkmeans.h goal_implementations/spk.h goal_implementations/spk.c)
+add_executable (spk spkmeans.c spkmeans.h
+        utils.c utils.h
+        goal_implementations/wam.c goal_implementations/wam.h)
