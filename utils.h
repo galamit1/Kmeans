@@ -8,13 +8,14 @@
 /**STRUCT DEFINITIONS**/
 /**********************/
 
-typedef struct Matrix {
+
+ struct MatrixStruct {
     double** cells;
     int rows;
     int cols;
-} Matrix ;
+}typedef Matrix ;
 
-typedef struct Cell {
+typedef struct CellStruct {
     int row;
     int col;
     double value;
@@ -38,4 +39,3 @@ int getNumPoints(FILE *fptr);
 int getNumCoordinates(FILE *fptr);
 void getPointsFromFile (int numPoints, int numCoordinates, FILE *fptr, double** points);
 void singleLineToPoint (double* point, char* singleLine);
-double** get_points (char *path);
