@@ -16,7 +16,7 @@ def get_arguments():
         data = f.read()
     points = [[float(num) for num in row.split(COORDINATES_SEPARATOR)] for row in data.split(POINTS_SEPARATOR)]
     if k >= len(points):
-        print("K should be smaller than N")
+        print("Invalid Input!")
         raise Exception
     return k, goal, points
 
@@ -25,7 +25,7 @@ def main():
     try:
         k, goal, points = get_arguments()
     except:
-        print("Invalid arguments")
+        print("Invalid Input!")
         return
 
     result = []
