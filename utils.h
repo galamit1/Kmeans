@@ -28,7 +28,7 @@ typedef struct CellStruct {
 /**FUNCTION DECLARATION**/
 /**********************/
 
-double** get_points (char *path);
+Matrix* get_points_matrix (char *path);
 Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates);
 void printMatrix (Matrix* m);
 Matrix* getZerosMatrixSizeN (int n);
