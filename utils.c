@@ -250,22 +250,34 @@ Matrix* get_points_matrix (char *path) {
     FILE *file_ptr;
     double** points;
     int numPoints, numCoordinates;
-    int i;
-    
-    file_ptr = fopen(path, "r");
-    if (file_ptr != NULL) {
+
+    if ((file_ptr = fopen(path, "r")) != NULL) {
         numPoints = getNumPoints(file_ptr);
         numCoordinates = getNumCoordinates(file_ptr);
 
         //Allocate memory for 2D-array
         points = (double**)malloc(numPoints * sizeof(double*));
-        for (i=0; i < numPoints; i++) {
+        if (points == NULL) {
+            free(points_matrix);
+            return NULL;
+        }
+        for (int i=0; i < numPoints; i++) {
             points[i] = (double*)malloc(numCoordinates * sizeof(double));
-            assert(points[i] != NULL); //TODO: add printf off error message
+            if (points[i] == NULL) {
+                for (int j=0; j < i; j++) {
+                    free(points[i]);
+                }
+                free(points);
+                free(points_matrix);
+                return NULL;
+            }
         }
 
     /*Fill array with parsed values from files*/
     getPointsFromFile(numPoints , numCoordinates , file_ptr , points);
+    } else {
+        free(points_matrix);
+        return NULL;
     }
 
     fclose(file_ptr);
