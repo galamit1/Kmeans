@@ -10,15 +10,42 @@
 
 #define EPSILON 1.0e-15
 
-/*TODO: implement iterative getEigenVectors function (with limit of 100 iterations), which should include getEigenValues function*/
-
-int getEigenGapK (double* eigenValusArray) {
-    double max_gap;
-    int max_index;
-    int current_index;
+/*Recieves lnorm symmetric matrix, runs jacobi algorithm and returns n*k matrix U  containing the first k eigenvectors u1, . . . , uk of Lnorm columns. K is inferred by matrix size*/
+Matrix* run_jacobi (Matrix* lnorm) {
+    double* eigenValusArray;
     
 }
 
+int getEigenGapK (double* eigen_valus_array, int array_length) {
+    double max_gap, current_gap;
+    int max_index, current_index;
+
+    /***TODO: solve how to preserve original values order - another copy of array? array with mapping from index to value?***/
+    /*Sort the array*/
+    qsort(eigen_valus_array, array_length, sizeof(double), standart_sort);
+    /*Set first index to be initial max gap & index*/
+    max_index = 0;
+    max_gap = abs(eigen_valus_array[0] - eigen_valus_array[1]);
+
+    /*Iterate rest of eigenValues*/
+    for (current_index = 0; current_index < (array_length - 1); current_index++) {
+        current_gap = abs(eigen_valus_array[current_index] - eigen_valus_array[current_index + 1]);
+        /*In case of equality in the argmax of some eigengaps, use the lowest index - therefore we use > and not >=*/
+        if (current_gap > max_gap) {
+            max_gap = current_gap;
+            max_index = current_index;
+        }
+    }
+
+    /*Indexes start with 0 but we need number of eigenvalues before gap - therefore we add 1 to max_index*/
+    return (max_index + 1);
+}
+
+int standart_sort (double a, double b) {
+    return (a < b);
+}
+
+/*Receives symmetric matrix and empty array, returns n*n eigenvectors matrix (including memory allocation) and fills array accordingly in-place with corresponding eigenvalues*/
 Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigenValusArray) {
     Matrix* current_A_matrix;
     Matrix* v_matrix;
@@ -67,7 +94,6 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigenValusArra
     }
 
     return v_matrix;
-
 }   
 
 /*Preform pivot from A to A' according to input A,c,s,i,j and free memory of A*/
@@ -109,7 +135,6 @@ double getOffDiagonalSumOfMatrix (Matrix* m) {
     sum *= 2;
 
     return sum;
-
 }
 
 /*Recieves symmetric matrix m and returns rotation matrix for m*/
