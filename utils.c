@@ -56,10 +56,10 @@ void printMatrix (Matrix* m) {
 
     printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
     for (i=0; i < m -> rows; i++) {
-        for (j=0; j < m -> cols; j++) {
-             printf("%f,", m -> cells[i][j]);
+        for (j=0; j < m -> cols - 1; j++) {
+             printf("%.4f,", m -> cells[i][j]);
          }
-         printf("\n");
+         printf("%.4f\n", m -> cells[i][j]);
      }
 }
 
@@ -183,11 +183,17 @@ void freeMatrixMemory (Matrix* m) {
 int getNumPoints(FILE *file_ptr) {
     int countPoints = 1;
     char ch;
+    int curr_location;
 
     while ((ch = fgetc(file_ptr)) != EOF) {
         if (ch == '\n') {
             countPoints++;
+            curr_location = ftell(file_ptr);
+
         }
+    }
+    if (curr_location == ftell(file_ptr)) { // there is an extra \n at the end of the file
+        countPoints --;
     }
     rewind(file_ptr);
     return countPoints;

@@ -49,17 +49,31 @@ int main(int argc, char **argv) {
     if (strcmp(goal, "wam") == 0) {
         Matrix * wam_matrix = run_wam(points_matrix);
         printMatrix(wam_matrix);
+        
         freeMatrixMemory(wam_matrix);
         freeMatrixMemory(points_matrix);
         exit(0);
     }
     if (strcmp(goal, "ddg") == 0) {
         Matrix * wam_matrix = run_wam(points_matrix);
-        printMatrix(wam_matrix);
         Matrix * ddg_matrix = run_ddg(wam_matrix);
         printMatrix(ddg_matrix);
+
         freeMatrixMemory(wam_matrix);
         freeMatrixMemory(ddg_matrix);
+        freeMatrixMemory(points_matrix);
+        exit(0);
+    }
+    if (strcmp(goal, "lnorm") == 0) {
+        Matrix * wam_matrix = run_wam(points_matrix);
+        Matrix * ddg_matrix = run_ddg(wam_matrix);
+        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
+        Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
+        printMatrix(lnorm_matrix);
+
+        freeMatrixMemory(wam_matrix);
+        freeMatrixMemory(ddg_matrix);
+        freeMatrixMemory(lnorm_matrix);
         freeMatrixMemory(points_matrix);
         exit(0);
     }
