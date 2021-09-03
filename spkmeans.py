@@ -3,6 +3,7 @@ import sys
 import numpy as np
 
 import mykmeanssp
+import myspkmeans
 from python_goal_implementations.wam import wam_run
 from python_goal_implementations.ddg import ddg_run
 from python_goal_implementations.lnorm import lnorm_run
@@ -23,7 +24,7 @@ def get_arguments():
         raise Exception
     return k, goal, points
 
-def run_spk(points, k):
+def run_spk(points, k, goal):
     points = np.array(points)
     np.random.seed(0)
     points_num = points.shape[0]
@@ -36,7 +37,7 @@ def run_spk(points, k):
         probs = np.divide(distances, distances.sum())
         centroids_indexes = np.append(centroids_indexes, np.random.choice(points_num, 1, p=probs), axis=0)
         centroids = np.append(centroids, points[[centroids_indexes[-1]]], axis=0)
-    centroids_output = np.array(mykmeanssp.fit(points.tolist(), centroids.tolist(), k, 300, len(points), len(points[0])))
+    centroids_output = np.array(mykmeanssp.fit(points.tolist(), centroids.tolist(), k, goal, len(points), len(points[0])))
     centroids_output = np.round(centroids_output, decimals=4)
     print(POINTS_SEPARATOR.join([COORDINATES_SEPARATOR.join([str(c) for c in centroid]) for centroid in centroids_output.tolist()]))
 
@@ -50,16 +51,9 @@ def main():
 
     result = []
     if goal == "spk":
-        run_spk(points, k)
-    elif goal == "wam":
-        result = wam_run(points).tolist()
-    elif goal == "ddg":
-        result = ddg_run(points).tolist()
-    elif goal == "lnorm":
-        result = lnorm_run(points).tolist()  # we get identity matrix because D*W == zeros !!!
+        run_spk(points, k, goal)
     else:
-        print("Invalid goal")
-        return
+        myspkmeans.fit(points, goal, len(points), len(points[0]))
 
     output = POINTS_SEPARATOR.join(
         [COORDINATES_SEPARATOR.join(["{:.4f}".format(round(i, 4)) for i in c]) for c in result])

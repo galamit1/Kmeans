@@ -15,6 +15,7 @@ setup(
     ext_modules=[
         Extension(
             'mykmeanssp', ['kmeans.c'],
+            'myspkmeans', ['spkmeans.c'],
         ),
     ]
 )

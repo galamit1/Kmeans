@@ -39,7 +39,8 @@ double get_distance (Cluster* cluster, const double* point, int num_coordinates)
 static PyObject* c_kmeans(PyObject *self, PyObject *args) {
     /*Define variables to receive from user*/
     int k;
-    int max_iter;
+    int max_iter = 300;
+    char * goal;
     int num_points;
     int num_coordinates;
     PyObject *data_points;
@@ -59,7 +60,7 @@ static PyObject* c_kmeans(PyObject *self, PyObject *args) {
 
 
     /* Parse arguments from Python */
-    if((!PyArg_ParseTuple(args, "OOiiii", &data_points, &initial_centroids, &k, &max_iter, &num_points, &num_coordinates))) {
+    if((!PyArg_ParseTuple(args, "OOisii", &data_points, &initial_centroids, &k, &goal, &num_points, &num_coordinates))) {
         return NULL; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
     }
 
@@ -362,7 +363,6 @@ double get_distance (Cluster* cluster, const double* point, int num_coordinates)
 /*** Module setup ***/
 /*******************************/
 
-/*TODO: verift syntax is correct*/
 static PyMethodDef _methods[] = {
         {"fit",
                 (PyCFunction) c_kmeans,
