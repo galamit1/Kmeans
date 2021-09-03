@@ -2,18 +2,15 @@
 // Created by galam on 26/07/2021.
 //
 
-#include "jacobi.h"
-#include "../utils.c"
-#include <assert.h>
-#include <math.h>
-
+#include "./jacobi.h"
 
 #define EPSILON 1.0e-15
+#define NUM_ITERATIONS 100
 
 /*Recieves lnorm symmetric matrix, runs jacobi algorithm and returns n*k matrix U  containing the first k eigenvectors u1, . . . , uk of Lnorm columns. K is inferred by matrix size*/
 Matrix* run_jacobi (Matrix* lnorm) {
     double* eigenValusArray;
-    
+    /*TODO*/
 }
 
 int getEigenGapK (double* eigen_valus_array, int array_length) {
@@ -64,7 +61,7 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigenValusArra
     a_current_off = getOffDiagonalSumOfMatrix(current_A_matrix);
     num_iterations = 0;
 
-    while ((num_iterations < 100) && (a_current_off - a_previous_off <= EPSILON)) {
+    while ((num_iterations < NUM_ITERATIONS) && (a_current_off - a_previous_off <= EPSILON)) {
         /*calculte theta,t,c,s according to formula*/
         largestNonDiagonalCell = getCellWithLargestValue(current_A_matrix);
         i = largestNonDiagonalCell -> row;
