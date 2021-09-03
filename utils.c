@@ -13,7 +13,7 @@
 //     int i,j;
 //     Matrix* points_matrix;
 
-//     points = get_points("./example.txt");
+//     points = get_points_matrix("./example.txt");
 
 //     file_ptr = fopen("./example.txt", "r");
 //     assert(file_ptr != NULL);
@@ -65,21 +65,16 @@ void printMatrix (Matrix* m) {
 
 /*Allocates memory and returns n*n zeros matrix, including memory allocation*/
 Matrix* getZerosMatrixSizeN (int n) {
-    int i;
-    Matrix* zerosMatrix;
-
-    /*allocate memory*/
-    zerosMatrix = malloc(sizeof(Matrix));
+    Matrix* zerosMatrix = malloc(sizeof(Matrix));
     assert (zerosMatrix != NULL); //TODO: add printf off error message
     /*initialize parameters, including n*n matrix with memory*/
     zerosMatrix -> rows = n;
     zerosMatrix -> cols = n;
-    zerosMatrix -> cells = calloc(n, sizeof(double*));
-    for (i=0; i < n; i++) {
+    zerosMatrix -> cells = malloc(n * sizeof(double*));
+    for (int i=0; i < n; i++) {
         zerosMatrix -> cells[i] = calloc(n, sizeof(double));
         assert (zerosMatrix -> cells[i] != NULL); //TODO: add printf off error message
     }
-
     return zerosMatrix;
 }
 
@@ -244,7 +239,8 @@ void singleLineToPoint (double* point, char* singleLine) {
 }
 
 /*Receives path to file and returns 2D matrix with all points, including memory allocation and closing the pointer*/
-double** get_points (char *path) {
+Matrix* get_points_matrix (char *path) {
+    Matrix * points_matrix = malloc(sizeof(Matrix));
     FILE *file_ptr;
     double** points;
     int numPoints, numCoordinates;
@@ -267,6 +263,9 @@ double** get_points (char *path) {
     }
 
     fclose(file_ptr);
+    points_matrix->cells = points;
+    points_matrix->rows = numPoints;
+    points_matrix->cols = numCoordinates;
     
-    return points;
+    return points_matrix;
 }
