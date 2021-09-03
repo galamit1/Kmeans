@@ -5,3 +5,4 @@
 #include "../utils.h"
 
 Matrix * run_ddg(Matrix * wam);
+void convert_ddg_with_the_pow_of_minus_half(Matrix * ddg_matrix);

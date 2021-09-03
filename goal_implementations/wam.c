@@ -19,7 +19,7 @@ Matrix * run_wam(Matrix * points) {
 }
 
 double calculate_weight(double * point1, double * point2, int num_coordinates) {
-    int weight = 0;
+    double weight = 0;
     for (int i = 0; i < num_coordinates; i++) {
         weight += pow(point1[i] - point2[i], 2);
     }
