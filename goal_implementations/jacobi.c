@@ -9,17 +9,63 @@
 
 /*Recieves lnorm symmetric matrix, runs jacobi algorithm and returns n*k matrix U  containing the first k eigenvectors u1, . . . , uk of Lnorm columns. K is inferred by matrix size*/
 Matrix* run_jacobi (Matrix* lnorm) {
-    double* eigenValusArray;
-    /*TODO*/
+    Matrix* eigen_vectors_matrix;
+    Matrix* final_U_matrix;
+    double* eigen_valus_array;
+    int* indexes_array;
+    int n;
+    int k;
+    int i;
+
+    n = lnorm -> rows;
+    /*allocate memory for eigenvalues array*/
+    eigen_valus_array = (double*)malloc(n * sizeof(double));
+    assert (eigen_valus_array != NULL); //TODO: add printf off error message
+    /*get eigenvectors and update eigenvalues array accordingly*/
+    eigen_vectors_matrix = getEigenVectorsAndValues(lnorm, eigen_valus_array);
+    /*get initial indexes array i.e. [0,1,...,n-1] */
+    indexes_array = get_initial_indexes_array(n);
+    /*get eigengap k and preserve original indexes during sort*/
+    k = getEigenGapK(eigen_valus_array, indexes_array, n);
+
+    /*allocate memory for U - a n*k Matrix*/
+    final_U_matrix = malloc(sizeof(Matrix));
+    assert (final_U_matrix != NULL); //TODO: add printf off error message
+    /*initialize parameters, including n*k matrix with memory*/
+    final_U_matrix -> rows = n;
+    final_U_matrix -> cols = k;
+    final_U_matrix -> cells = malloc(n * sizeof(double*));
+    assert (final_U_matrix -> cells != NULL); //TODO: add printf off error message
+    for (i=0; i < n; i++) {
+        final_U_matrix -> cells[i] = (double*)malloc(k * sizeof(double*));
+        assert (final_U_matrix -> cells[i] != NULL); //TODO: add printf off error message
+    }
+
+    /*point to k eigenvectors that correspond to k smallest eigenvalues*/
+    for (i=0; i < k; i++) {
+        get_column_by_index(final_U_matrix, eigen_vectors_matrix, indexes_array[i], i, n);
+    }
+    
+    return final_U_matrix;
 }
 
-int getEigenGapK (double* eigen_valus_array, int array_length) {
+/*Receive 2 Matrixes, column size and column indexes for both matrixes, copy column from relevant index in m2 to relevant index in m1*/
+void get_column_by_index(Matrix* m1, Matrix* m2, int m1_index, int m2_index, int column_size) {
+    int i;
+
+    for (i=0; i < column_size; i++) {
+        m1 -> cells[i][m1_index] = m2 -> cells[i][m2_index];
+    }
+}
+
+/*Recieve eigenvalues array & initial indexes array, calculate k by eigengap heuristic and update indexes array along with sorting values array*/
+int getEigenGapK (double* eigen_valus_array, double* indexes_array, int array_length) {
     double max_gap, current_gap;
     int max_index, current_index;
 
-    /***TODO: solve how to preserve original values order - another copy of array? array with mapping from index to value?***/
-    /*Sort the array*/
-    qsort(eigen_valus_array, array_length, sizeof(double), standart_sort);
+    /*Sort the array and preserve indexes*/
+    bubble_sort_preserve_indexs(eigen_valus_array, indexes_array, array_length);
+
     /*Set first index to be initial max gap & index*/
     max_index = 0;
     max_gap = abs(eigen_valus_array[0] - eigen_valus_array[1]);
@@ -38,12 +84,48 @@ int getEigenGapK (double* eigen_valus_array, int array_length) {
     return (max_index + 1);
 }
 
-int standart_sort (double a, double b) {
-    return (a < b);
+
+/*Bubble sort code from: https://www.geeksforgeeks.org/bubble-sort/*/
+/*Recieve 2 double pointers and swap them*/
+void swap(double *xp, double *yp) {
+    double temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
+/*Recieves an array of doubles & array of indexes, bubble-sorts both arrays accordingly in-place*/
+void bubble_sort_preserve_indexs(double* values, double* indexes, int array_length) {
+   int i, j;
+
+   for (i = 0; i < array_length-1; i++)      
+       // Last i elements are already in place   
+       for (j = 0; j < array_length-i-1; j++) 
+           if (values[j] > values[j+1]) {
+              swap(&values[j], &values[j+1]);
+              swap(&indexes[j], &indexes[j+1]);
+           }
+}
+
+/*Recieve desired array length n, allocate memory and return an indexes-array of same length*/
+int* get_initial_indexes_array (int n) {
+    int* indexes_array;
+    int i;
+
+    /*allocate memory*/
+    indexes_array = (int*)malloc(n * sizeof(int));
+    assert (indexes_array != NULL); //TODO: add printf off error message
+
+    /*Insert initial indexes values to array*/
+    for (i=0; i < n; i++) {
+        indexes_array[i] = i;
+    }
+
+    return indexes_array;
+
 }
 
 /*Receives symmetric matrix and empty array, returns n*n eigenvectors matrix (including memory allocation) and fills array accordingly in-place with corresponding eigenvalues*/
-Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigenValusArray) {
+Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigen_valus_array) {
     Matrix* current_A_matrix;
     Matrix* v_matrix;
     Matrix* current_P_matrix;
@@ -87,7 +169,7 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigenValusArra
 
     /*Update the eigenValues in array in-place*/
     for (i=0; i < current_A_matrix -> rows; i++) {
-        eigenValusArray[i] = current_A_matrix -> cells[i][i];
+        eigen_valus_array[i] = current_A_matrix -> cells[i][i];
     }
 
     return v_matrix;
