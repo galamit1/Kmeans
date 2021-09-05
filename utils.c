@@ -49,7 +49,7 @@ Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates
     return output;
 }
 
-/*Receives Matrix and prints it*/
+/*Receives Matrix and prints it - 4 decimal points*/
 void printMatrix (Matrix* m) {
     double** cells;
     int i,j;
@@ -60,6 +60,20 @@ void printMatrix (Matrix* m) {
              printf("%.4f,", m -> cells[i][j]);
          }
          printf("%.4f\n", m -> cells[i][j]);
+     }
+}
+
+/*Receives Matrix and prints it as is*/
+void printFullMatrix (Matrix* m) {
+    double** cells;
+    int i,j;
+
+    printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
+    for (i=0; i < m -> rows; i++) {
+        for (j=0; j < m -> cols - 1; j++) {
+             printf("%f,", m -> cells[i][j]);
+         }
+         printf("%f\n", m -> cells[i][j]);
      }
 }
 
@@ -96,20 +110,21 @@ Matrix* getIdentitiyMatrixSizeN (int n) {
 
 /*Recieves symmetric matrix and returns Cell with largest absolute value (above diagonal)*/
 Cell* getCellWithLargestValue (Matrix* m) {
-    int i,j, currAbsoluteValue;
+    int i,j;
+    double currAbsoluteValue;
     Cell* largestCell;
     
     /*Initialize cell*/
-    largestCell = malloc(sizeof(Cell));
+    largestCell = (Cell*)malloc(sizeof(Cell*));
     assert (largestCell != NULL); //TODO: add printf off error message
     largestCell -> row = -1;
     largestCell -> col = -1;
-    largestCell -> value = -INFINITY;
+    largestCell -> value = -MAXIMUM_DOUBLE;
 
     /*find largest absolute value and update largestCell accordingly*/
     for (i=0; i < m -> rows; i++) {
         for (j=i+1; j < m -> cols; j++) {
-            currAbsoluteValue = abs(m -> cells[i][j]);
+            currAbsoluteValue = fabs(m -> cells[i][j]);
             if (currAbsoluteValue > largestCell -> value) {
                 largestCell -> row = i;
                 largestCell -> col = j;
@@ -173,6 +188,22 @@ void freeMatrixMemory (Matrix* m) {
     for (i=0; i < n; i++) {
             free(m -> cells[i]);
     }
+}
+
+Matrix* get_copy_of_matrix(Matrix* original) {
+    Matrix* new_matrix;
+    int n;
+    int i,j;
+
+    new_matrix = getZerosMatrixSizeN(original -> rows);
+    /*Update values do be identical*/
+    for (i=0; i < original -> rows; i++) {
+        for (j=0; j < original -> cols; j++) {
+            new_matrix -> cells[i][j] = original -> cells[i][j];
+        }
+    }
+
+    return new_matrix;
 }
 
 /**********************/

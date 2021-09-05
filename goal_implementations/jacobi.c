@@ -7,6 +7,29 @@
 #define EPSILON 1.0e-15
 #define NUM_ITERATIONS 100
 
+/**********************/
+/**TESTING ONLY - DON'T FORGET TO REMOVE**/
+/**********************/
+
+ int main () {
+     Matrix* lnorm;
+     Matrix* lnorm_copy;
+     Matrix* jacobi;
+
+     lnorm = get_points_matrix("./lnorm-example.txt");
+    //  printf("Original: \n");
+    //  printMatrix(lnorm); 
+
+    jacobi = run_jacobi(lnorm);
+    printMatrix(jacobi);
+    
+     return 0;
+ }
+
+/**********************/
+/**TESTING ONLY - DON'T FORGET TO REMOVE**/
+/**********************/
+
 /*Recieves lnorm symmetric matrix, runs jacobi algorithm and returns n*k matrix U  containing the first k eigenvectors u1, . . . , uk of Lnorm columns. K is inferred by matrix size*/
 Matrix* run_jacobi (Matrix* lnorm) {
     Matrix* eigen_vectors_matrix;
@@ -23,6 +46,10 @@ Matrix* run_jacobi (Matrix* lnorm) {
     assert (eigen_valus_array != NULL); //TODO: add printf off error message
     /*get eigenvectors and update eigenvalues array accordingly*/
     eigen_vectors_matrix = getEigenVectorsAndValues(lnorm, eigen_valus_array);
+    /*******DELETE******/
+    printf("Eigenvectors matrix is: \n");
+    printMatrix(eigen_vectors_matrix);
+    /*******DELETE******/
     /*get initial indexes array i.e. [0,1,...,n-1] */
     indexes_array = get_initial_indexes_array(n);
     /*get eigengap k and preserve original indexes during sort*/
@@ -59,7 +86,7 @@ void get_column_by_index(Matrix* m1, Matrix* m2, int m1_index, int m2_index, int
 }
 
 /*Recieve eigenvalues array & initial indexes array, calculate k by eigengap heuristic and update indexes array along with sorting values array*/
-int getEigenGapK (double* eigen_valus_array, double* indexes_array, int array_length) {
+int getEigenGapK (double* eigen_valus_array, int* indexes_array, int array_length) {
     double max_gap, current_gap;
     int max_index, current_index;
 
@@ -68,11 +95,11 @@ int getEigenGapK (double* eigen_valus_array, double* indexes_array, int array_le
 
     /*Set first index to be initial max gap & index*/
     max_index = 0;
-    max_gap = abs(eigen_valus_array[0] - eigen_valus_array[1]);
+    max_gap = fabs(eigen_valus_array[0] - eigen_valus_array[1]);
 
     /*Iterate rest of eigenValues*/
     for (current_index = 0; current_index < (array_length - 1); current_index++) {
-        current_gap = abs(eigen_valus_array[current_index] - eigen_valus_array[current_index + 1]);
+        current_gap = fabs(eigen_valus_array[current_index] - eigen_valus_array[current_index + 1]);
         /*In case of equality in the argmax of some eigengaps, use the lowest index - therefore we use > and not >=*/
         if (current_gap > max_gap) {
             max_gap = current_gap;
@@ -87,22 +114,28 @@ int getEigenGapK (double* eigen_valus_array, double* indexes_array, int array_le
 
 /*Bubble sort code from: https://www.geeksforgeeks.org/bubble-sort/*/
 /*Recieve 2 double pointers and swap them*/
-void swap(double *xp, double *yp) {
+void swap_doubles(double *xp, double *yp) {
     double temp = *xp;
     *xp = *yp;
     *yp = temp;
 }
 
+void swap_ints(int *xp, int *yp) {
+    int temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+
 /*Recieves an array of doubles & array of indexes, bubble-sorts both arrays accordingly in-place*/
-void bubble_sort_preserve_indexs(double* values, double* indexes, int array_length) {
+void bubble_sort_preserve_indexs(double* values, int* indexes, int array_length) {
    int i, j;
 
    for (i = 0; i < array_length-1; i++)      
        // Last i elements are already in place   
        for (j = 0; j < array_length-i-1; j++) 
            if (values[j] > values[j+1]) {
-              swap(&values[j], &values[j+1]);
-              swap(&indexes[j], &indexes[j+1]);
+              swap_doubles(&values[j], &values[j+1]);
+              swap_ints(&indexes[j], &indexes[j+1]);
            }
 }
 
@@ -139,17 +172,17 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigen_valus_ar
     /*Initialize V to be identity matrix - agnostic to matrix multiplication*/
     v_matrix = getIdentitiyMatrixSizeN(originalMatrix -> rows);
 
-    a_previous_off = INFINITY*(-1);
+    a_previous_off = MAXIMUM_DOUBLE;
     a_current_off = getOffDiagonalSumOfMatrix(current_A_matrix);
     num_iterations = 0;
 
-    while ((num_iterations < NUM_ITERATIONS) && (a_current_off - a_previous_off <= EPSILON)) {
+    while ((num_iterations < NUM_ITERATIONS) && (a_previous_off - a_current_off > EPSILON)) {
         /*calculte theta,t,c,s according to formula*/
         largestNonDiagonalCell = getCellWithLargestValue(current_A_matrix);
         i = largestNonDiagonalCell -> row;
         j = largestNonDiagonalCell -> col;
         theta = (current_A_matrix -> cells[j][j] - current_A_matrix -> cells[i][i]) / (2 * current_A_matrix -> cells[i][j]);
-        t = sign(theta) / (abs(theta) + sqrt(pow(theta,2) + 1));
+        t = sign(theta) / (fabs(theta) + sqrt(pow(theta,2) + 1));
         c = 1 / (sqrt(pow(t,2) + 1));
         s = t * c;
 
@@ -161,6 +194,7 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigen_valus_ar
         
         /*Preform pivot step from A to A' and update Off values*/
         current_A_matrix = preformPivotStepAndFreeMemory(current_A_matrix, i, j, c, s);
+        
         a_previous_off = a_current_off;
         a_current_off = getOffDiagonalSumOfMatrix(current_A_matrix);
 
@@ -180,18 +214,23 @@ Matrix* preformPivotStepAndFreeMemory (Matrix* A, int i, int j, double c, double
     Matrix* newA;
     int r;
 
-    newA = getZerosMatrixSizeN(A -> rows);
+    newA = get_copy_of_matrix(A);
 
     /*iterate only on rows i,j and columns i,j */
     for (r=0; r < A -> rows; r++) {
+        /*Change column i & row i*/
         newA -> cells[r][i] = (c * A -> cells[r][i]) - (s * A -> cells[r][j]);
+        newA -> cells[i][r] = newA -> cells[r][i];
+        /*Change column j & row j*/
         newA -> cells[r][j] = (c * A -> cells[r][j]) + (s *  A -> cells[r][i]);
+        newA -> cells[j][r] = newA -> cells[r][j];
     }
 
     /*correct values for A'[i][i], A'[j][j] & A'[i][j]*/
     newA -> cells[i][i] = (pow(c,2) * A -> cells[i][i]) + (pow(s,2) * A -> cells[j][j]) - (2 * s * c * A -> cells[i][j]);
-    newA -> cells[j][j] = (pow(s,2) * A -> cells[i][i]) + (pow(c,2) * A -> cells[j][j]) - (2 * s * c * A -> cells[i][j]);
+    newA -> cells[j][j] = (pow(s,2) * A -> cells[i][i]) + (pow(c,2) * A -> cells[j][j]) + (2 * s * c * A -> cells[i][j]);
     newA -> cells[i][j] = 0;
+    newA -> cells[j][i] = 0;
 
     /*Free memory of original A*/
     freeMatrixMemory(A);

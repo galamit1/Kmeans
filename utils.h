@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAXIMUM_DOUBLE 1.7E+308
+
 /**********************/
 /**STRUCT DEFINITIONS**/
 /**********************/
@@ -31,6 +33,7 @@ typedef struct CellStruct {
 Matrix* get_points_matrix (char *path);
 Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates);
 void printMatrix (Matrix* m);
+void printFullMatrix (Matrix* m);
 Matrix* getZerosMatrixSizeN (int n);
 Matrix* getIdentitiyMatrixSizeN (int n);
 Cell* getCellWithLargestValue (Matrix* m);
@@ -38,6 +41,7 @@ int isDiagonalMatrix (Matrix* m);
 int sign (double num);
 Matrix* multiplyMatricesAndFreeMemory (Matrix* m1, Matrix* m2);
 void freeMatrixMemory (Matrix* m);
+Matrix* get_copy_of_matrix(Matrix* original);
 int getNumPoints(FILE *fptr);
 int getNumCoordinates(FILE *fptr);
 void getPointsFromFile (int numPoints, int numCoordinates, FILE *fptr, double** points);

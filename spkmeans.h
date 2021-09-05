@@ -8,6 +8,7 @@
 #include "goal_implementations/ddg.h"
 #include "goal_implementations/lnorm.h"
 #include "goal_implementations/spk.h"
+#include "goal_implementations/jacobi.h"
 
 int main(int argc, char **argv);
 int main1(int argc, char **argv);
