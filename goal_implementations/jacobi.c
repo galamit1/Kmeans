@@ -47,7 +47,7 @@ Matrix* run_jacobi (Matrix* lnorm) {
     /*get eigenvectors and update eigenvalues array accordingly*/
     eigen_vectors_matrix = getEigenVectorsAndValues(lnorm, eigen_valus_array);
     /*******DELETE******/
-    printf("Eigenvectors matrix is: \n");
+    printf("FInal Eigenvectors matrix V is: \n");
     printMatrix(eigen_vectors_matrix);
     /*******DELETE******/
     /*get initial indexes array i.e. [0,1,...,n-1] */
@@ -167,6 +167,9 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigen_valus_ar
     double theta,t,c,s;
     Cell* largestNonDiagonalCell;
 
+    largestNonDiagonalCell = (Cell*)malloc(sizeof(Cell*));
+    assert (largestNonDiagonalCell != NULL); //TODO: add printf off error message
+
     /*Start with input matrix as A*/
     current_A_matrix = originalMatrix;
     /*Initialize V to be identity matrix - agnostic to matrix multiplication*/
@@ -177,29 +180,43 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigen_valus_ar
     num_iterations = 0;
 
     while ((num_iterations < NUM_ITERATIONS) && (a_previous_off - a_current_off > EPSILON)) {
+        printf("Iteration number %d: \n", num_iterations);
         /*calculte theta,t,c,s according to formula*/
-        largestNonDiagonalCell = getCellWithLargestValue(current_A_matrix);
+        getCellWithLargestValue(current_A_matrix, largestNonDiagonalCell);
         i = largestNonDiagonalCell -> row;
         j = largestNonDiagonalCell -> col;
         theta = (current_A_matrix -> cells[j][j] - current_A_matrix -> cells[i][i]) / (2 * current_A_matrix -> cells[i][j]);
         t = sign(theta) / (fabs(theta) + sqrt(pow(theta,2) + 1));
         c = 1 / (sqrt(pow(t,2) + 1));
         s = t * c;
+        printf("Largest cell is: row = %d, col = %d, abs value = %f\n", largestNonDiagonalCell->row, largestNonDiagonalCell->col, largestNonDiagonalCell->value);
+        printf("Values are: s = %f, c = %f \n", s, c);
 
         /*Get P matrix according to c & s*/
         current_P_matrix = getRotationMatrixForM(current_A_matrix, largestNonDiagonalCell, c, s);
+        printf("P matrix is: \n");
+        printFullMatrix(current_P_matrix);
 
         /*Update V according to current P*/
         v_matrix = multiplyMatricesAndFreeMemory(v_matrix, current_P_matrix);
+        printf("V matrix is: \n");
+        printFullMatrix(v_matrix);
+
         
         /*Preform pivot step from A to A' and update Off values*/
         current_A_matrix = preformPivotStepAndFreeMemory(current_A_matrix, i, j, c, s);
+        printf("A' matrix is: \n");
+        printFullMatrix(current_A_matrix);
+        printf("\n ======================== \n");
+
         
         a_previous_off = a_current_off;
         a_current_off = getOffDiagonalSumOfMatrix(current_A_matrix);
 
         num_iterations++;
     }
+
+    free(largestNonDiagonalCell); /*Largest cell data is un-needed from this point, so free the memory space allocated by getCellWithLargestValue*/
 
     /*Update the eigenValues in array in-place*/
     for (i=0; i < current_A_matrix -> rows; i++) {

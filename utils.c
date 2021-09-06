@@ -109,18 +109,14 @@ Matrix* getIdentitiyMatrixSizeN (int n) {
 }
 
 /*Recieves symmetric matrix and returns Cell with largest absolute value (above diagonal)*/
-Cell* getCellWithLargestValue (Matrix* m) {
+void getCellWithLargestValue (Matrix* m, Cell* cell_pointer) {
     int i,j;
     double currAbsoluteValue;
     Cell* largestCell;
-    
     /*Initialize cell*/
-    largestCell = (Cell*)malloc(sizeof(Cell*));
-    assert (largestCell != NULL); //TODO: add printf off error message
     largestCell -> row = -1;
     largestCell -> col = -1;
     largestCell -> value = -MAXIMUM_DOUBLE;
-
     /*find largest absolute value and update largestCell accordingly*/
     for (i=0; i < m -> rows; i++) {
         for (j=i+1; j < m -> cols; j++) {
@@ -133,7 +129,9 @@ Cell* getCellWithLargestValue (Matrix* m) {
         }
     }
 
-    return largestCell;
+    cell_pointer -> row = largestCell -> row;
+    cell_pointer -> col = largestCell -> col;
+    cell_pointer -> value = largestCell -> value;
 }
 
 /*Recieves symmetric matrix and checks wether it's diagonal or not*/
@@ -150,10 +148,10 @@ int isDiagonalMatrix (Matrix* m) {
 }
 
 /*Recieves number and returns its sign*/
-int sign (double num) {
+double sign (double num) {
     if (num >= 0)
-        return 1;
-    return -1;
+        return 1.0;
+    return -1.0;
 }
 
 /*Recieves two n*n symmetric matrices, returns their product and frees up memory used by those 2 matrices */
@@ -188,6 +186,8 @@ void freeMatrixMemory (Matrix* m) {
     for (i=0; i < n; i++) {
             free(m -> cells[i]);
     }
+
+    free(m);
 }
 
 Matrix* get_copy_of_matrix(Matrix* original) {
