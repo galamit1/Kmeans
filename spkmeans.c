@@ -1,3 +1,5 @@
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
 #include "spkmeans.h"
 
 
@@ -5,51 +7,7 @@
 /*** Main Function ***/
 /*******************************/
 
-int main(int argc, char **argv) {
-    int k;
-    char goal[7];
-    char filePath[1000];
-
-    FILE * file_ptr;
-    errno_t err;
-    int i,j;
-    Matrix * points_matrix;
-
-    int run = 0;
-
-    if (argc != 4) {
-        printf("Invalid Input!");
-        exit(1);
-    }
-    sscanf(argv[1], "%d", &k);
-    sscanf(argv[2], "%s", &goal);
-    sscanf(argv[3], "%s", &filePath);
-
-    if (k < 0) {
-        printf("Invalid Input!");
-        exit(1);
-    }
-    
-    if ((points_matrix = get_points_matrix(filePath)) == NULL) {
-        printf("An Error Has Occured");
-        exit(1);
-    }
-
-//    numPoints = getNumPoints(file_ptr);
-//    numCoordinates = getNumCoordinates(file_ptr); //TODO calculate it together
-//    points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
-
-    if (k == 0) //TODO the huristic
-    {
-        k=0;
-    }
-
-    if (k >= points_matrix->rows) { //TODO > or >=?
-        freeMatrixMemory(points_matrix);
-        exit(1);
-    }
-
-    /***Run the function according do the goal***/
+int run_functions_according_to_goal(char * goal, Matrix * points_matrix) {
     if (strcmp(goal, "wam") == 0) {
         Matrix * wam_matrix = run_wam(points_matrix);
         printMatrix(wam_matrix);
@@ -106,181 +64,122 @@ int main(int argc, char **argv) {
 }
 
 
+int main(int argc, char **argv) {
+    int k;
+    char goal[7];
+    char filePath[1000];
+
+    FILE * file_ptr;
+    errno_t err;
+    int i,j;
+    Matrix * points_matrix;
+
+    int run = 0;
+
+    if (argc != 4) {
+        printf("Invalid Input!");
+        exit(1);
+    }
+    sscanf(argv[1], "%d", &k);
+    sscanf(argv[2], "%s", &goal);
+    sscanf(argv[3], "%s", &filePath);
+
+    if (k < 0) {
+        printf("Invalid Input!");
+        exit(1);
+    }
+    
+    if ((points_matrix = get_points_matrix(filePath)) == NULL) {
+        printf("An Error Has Occured");
+        exit(1);
+    }
+
+//    numPoints = getNumPoints(file_ptr);
+//    numCoordinates = getNumCoordinates(file_ptr); //TODO calculate it together
+//    points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
+
+    if (k == 0) //TODO the huristic
+    {
+        k=0;
+    }
+
+    if (k >= points_matrix->rows) { //TODO > or >=?
+        freeMatrixMemory(points_matrix);
+        exit(1);
+    }
+
+    run_functions_according_to_goal(goal, points_matrix);
+}
+static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
+    /*Define variables to receive from user*/
+    int k;
+    int max_iter = 300;
+    char *goal;
+    int num_points;
+    int num_coordinates;
+    PyObject *data_points;
+    double **points;
+    Matrix * points_matrix;
 
 
-//int main1(int argc, char **argv) {
-//    /*argc = number of parameters (including program name), **argv = string array of parameters.*/
-//
-//    /***Variables declarations***/
-//    int k;
-//    char goal[7];
-//    char filePath[100];
-//    size_t read;
-//    size_t len;
-//    char * line;
-//
-//    /***enum Goal {SPK="spk", WAM="wam", DDG="ddg", LNORM="lnorm", JACOBI="jacobi"} goal_types;***/
-//    int num_points;
-//    int num_coordinates;
-//    char single_line[1000]; /*Rami gave assumption each line's length is <= 1000*/
-//    int line_num;
-//    double **points;
-//    double *point;
-//    Cluster **clusters;
-//    int i;
-//    int j;
-//    int run = 0;
-//
-//
-//    /***Input validation***/
-//    if (argc != 4) {
-//        printf("Invalid input: number of parameters should be 3."); //TODO: print generic error msg
-//        exit(0);
-//    }
-//
-//    sscanf(argv[1], "%d", &k);
-//    sscanf(argv[2], "%s", &goal);
-//    sscanf(argv[3], "%s", &filePath);
-//
-//    if (k <= 0) {
-//        printf("Invalid input: k should be > 0"); //TODO: print generic error msg
-//        exit(0);
-//    }
-//
-//    FILE * file = fopen(filePath, "r");
-//    if (stdin == NULL) {
-//        printf ("Couldn't open file"); //TODO: print generic error msg
-//        exit(0);
-//    }
-//
-//    /***Get data from file***/
-//    fgets(single_line , 1000, stdin);
-//    num_coordinates = get_num_coordinates(single_line);
-//    num_points = 1; /*Already scanned first line*/
-//    while (fgets(single_line, 1000, stdin) != NULL) {
-//        num_points++;
-//    }
-//
-//    rewind(stdin); /*Reset pointer to head of file*/
-//
-//    if (k > num_points) {
-//        printf ("Invalid input: more clusters than points"); //TODO: print generic error msg
-//        exit(0);
-//    }
-//
-//    points = init_points(num_points, num_coordinates);
-//    line_num = 0;
-//    fgets(single_line, 1000, stdin); /*Rami gave assumption there's at least 1 point*/
-//
-//    do {
-//        convert_line_to_point(points[line_num], single_line);
-//        line_num++;
-//    }
-//    while (fgets(single_line, 1000, stdin) != NULL);
-//
-//    fclose(stdin);
-//
-//    /***Run the function according do the goal***/
-//    if (strcmp(goal, "spk")) {
-//        spk_run(points, k, num_points, num_coordinates);
-//        run = 1;
-//    }
-//    if (run == 0) {
-//        printf("Invalid input: goal is not in of the options");
-//    }
-//
-//
-//    /***Print results***/
-//    for (i=0; i<k; i++) {
-//        for (j=0; j<num_coordinates; j++) {
-//            printf("%.4f", clusters[i]->curr_centroids[j]);
-//            if (j != (num_coordinates-1)) {
-//                printf(",");
-//            }
-//        }
-//        printf("\n");
-//    }
-//
-//    free_points_memory(points, num_points);
-//    return 0;
-//
-//}
+    /* Parse arguments from Python */
+    if ((!PyArg_ParseTuple(args, "Osii", &data_points, &goal, &num_points, &num_coordinates))) {
+        printf("An Error Has Occured");
+        return NULL; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
+    }
+
+    /*Verify that data_points & initial_indexes are python lists*/
+    if (!PyList_Check(data_points)) {
+        printf("An Error Has Occured");
+        return NULL;
+    }
+
+    /*Load points from PyObject into C format of 2D-array points*/
+    points = init_points(num_points, num_coordinates);
+
+    if (python_list_of_lists_to_2D_array(data_points, points) != 0) {
+        return NULL;
+    }
+    if ((points_matrix = malloc(sizeof(Matrix))) == NULL) {
+        printf("An Error Has Occured");
+    }
+
+    points_matrix->rows = num_points;
+    points_matrix->cols = num_coordinates;
+    points_matrix->cells = points;
+    run_functions_according_to_goal(goal, points_matrix);
+}
 
 /*******************************/
-/*** Function Implementation ***/
+/*** Module setup ***/
 /*******************************/
 
+static PyMethodDef _methods[] = {
+        {"fit",
+                (PyCFunction) c_spkmeans,
+                     METH_VARARGS,
+                PyDoc_STR("run functions according to goal"),
+        },
+        {NULL, NULL, 0, NULL} /*Sentinel*/
+};
 
-int get_num_coordinates(char* sinlge_line) {
-    /*
-    Recieves pointer to char array containing the first line (=point),
-    Returns number of coordinates in each point (we can assume all points have same amount of coordinates).
-    */
-    int count_coordinates = 1;
-    char* pointer = sinlge_line;
+static struct PyModuleDef _moduledef  = {
+        PyModuleDef_HEAD_INIT,
+        "myspkmeans",
+        NULL,
+        -1,
+        _methods
+};
 
-    while ((pointer = strchr(pointer, ',')) != NULL) {
-        pointer++;
-        count_coordinates++;
+PyMODINIT_FUNC
+PyInit_myspkmeans(void)
+{
+    PyObject *m;
+    m = PyModule_Create(&_moduledef);
+    if (!m) {
+        return NULL;
     }
-
-    return count_coordinates;
-}
-
-
-double** init_points (int num_points, int num_coordinates) {
-    /*
-   Recieves number of points and number of coordinates,
-   Returns new 2D array of points with sufficient memory to store all points.
-   */
-    double** points;
-    int i;
-
-    /*allocate memory for 2D array of points*/
-    points = (double**)malloc(sizeof(double*) * num_points);
-    assert(points != NULL);
-    for (i=0; i< num_points; i++) {
-        points[i] = (double*)malloc(sizeof(double) * num_coordinates);
-        assert(points[i] != NULL);
-    }
-
-    return points;
-}
-
-
-double* convert_line_to_point (double* point, char* line) {
-    /*
-   Recieves pointer to char array containing a line (=point) and pointer to initialized double-array (=point),
-   Returns the same point after filling it with double values from the line, using string.h functio strtok.
-   Reference: https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
-   */
-    char* tokens;
-    int index;
-
-    index = 0;
-
-    tokens = strtok(line, ",");
-
-    while (tokens != NULL) {
-        point[index] = atof(tokens);
-        tokens = strtok(NULL, ",");
-        index++;
-    }
-
-    return point;
-}
-
-
-void free_points_memory (double** points, int num_points) {
-    /*
-    Recieves 2D array of pounts and number of points,
-    Frees up memory used by all points.
-    */
-    int i;
-
-    for (i=0; i<num_points; i++) {
-        free(points[i]);
-    }
+    return m;
 }
 
 

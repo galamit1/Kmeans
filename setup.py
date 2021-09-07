@@ -1,11 +1,21 @@
-from setuptools import Extension, setup
+from setuptools import setup, find_packages, Extension
 
-module = Extension("capi_demo1",
-                  sources=[
-                    'cap.c',
-                    'capmodule.c'
-                  ])
-setup(name='capi_demo1',
-     version='1.0',
-     description='Python wrapper for custom C extension',
-     ext_modules=[module])
+setup(
+    name='kmeans_CPython_API',
+    version='0.0.1',
+    author='Gal and Ben',
+    description='CPython API',
+    install_requires=['invoke',
+                      'numpy',
+                      'pandas',
+                      'matplotlib',
+                      ],
+    packages=find_packages(),
+    license='GPL-2',
+    ext_modules=[
+        Extension(
+            'mykmeanssp', ['kmeans.c'],
+            'myspkmeans', ['spkmeans.c'],
+        ),
+    ]
+)
