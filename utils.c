@@ -62,6 +62,7 @@ void printMatrix (Matrix* m) {
      }
 }
 
+
 /*Receives Matrix and prints it as is*/
 void printFullMatrix (Matrix* m) {
     double** cells;
@@ -70,10 +71,10 @@ void printFullMatrix (Matrix* m) {
     printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
     for (i=0; i < m -> rows; i++) {
         for (j=0; j < m -> cols - 1; j++) {
-             printf("%f,", m -> cells[i][j]);
-         }
-         printf("%f\n", m -> cells[i][j]);
-     }
+            printf("%f,", m -> cells[i][j]);
+        }
+        printf("%f\n", m -> cells[i][j]);
+    }
 }
 
 /*Recieves integer n, allocates memory and returns n*n zeros matrix, including memory allocation*/

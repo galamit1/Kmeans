@@ -6,7 +6,6 @@
 /*******************************/
 /*** Main Function ***/
 /*******************************/
-
 int run_functions_according_to_goal(char * goal, Matrix * points_matrix) {
     if (strcmp(goal, "wam") == 0) {
         Matrix * wam_matrix = run_wam(points_matrix);
@@ -64,17 +63,13 @@ int run_functions_according_to_goal(char * goal, Matrix * points_matrix) {
 }
 
 
+
 int main(int argc, char **argv) {
     int k;
     char goal[7];
     char filePath[1000];
 
-    FILE * file_ptr;
-    errno_t err;
-    int i,j;
     Matrix * points_matrix;
-
-    int run = 0;
 
     if (argc != 4) {
         printf("Invalid Input!");
@@ -88,7 +83,7 @@ int main(int argc, char **argv) {
         printf("Invalid Input!");
         exit(1);
     }
-    
+
     if ((points_matrix = get_points_matrix(filePath)) == NULL) {
         printf("An Error Has Occured");
         exit(1);
@@ -107,9 +102,55 @@ int main(int argc, char **argv) {
         freeMatrixMemory(points_matrix);
         exit(1);
     }
-
-    run_functions_according_to_goal(goal, points_matrix);
+    run_functions_according_to_goal(goal, points_matrix, k);
 }
+
+
+void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k) {
+    int run = 0;
+
+    if (strcmp(goal, "wam") == 0) {
+        run = 1;
+        Matrix * wam_matrix = run_wam(points_matrix);
+        printMatrix(wam_matrix);
+
+        freeMatrixMemory(wam_matrix);
+    }
+    if (strcmp(goal, "ddg") == 0) {
+        run = 1;
+        Matrix * wam_matrix = run_wam(points_matrix);
+        Matrix * ddg_matrix = run_ddg(wam_matrix);
+        printMatrix(ddg_matrix);
+
+        freeMatrixMemory(wam_matrix);
+        freeMatrixMemory(ddg_matrix);
+    }
+    if (strcmp(goal, "lnorm") == 0) {
+        run = 1;
+        Matrix * wam_matrix = run_wam(points_matrix);
+        Matrix * ddg_matrix = run_ddg(wam_matrix);
+        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
+        Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
+        printFullMatrix(lnorm_matrix);
+
+        freeMatrixMemory(wam_matrix);
+        freeMatrixMemory(ddg_matrix);
+        freeMatrixMemory(lnorm_matrix);
+    }
+    if (strcmp(goal, "spk") == 0) {
+        run = 1;
+        run_spk(points_matrix, k);
+    }
+
+    if (run == 0) {
+        printf("Invalid input");
+    }
+
+    /***clean all***/
+    freeMatrixMemory(points_matrix);
+}
+
+
 static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
     /*Define variables to receive from user*/
     int k;
@@ -147,7 +188,7 @@ static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
     points_matrix->rows = num_points;
     points_matrix->cols = num_coordinates;
     points_matrix->cells = points;
-    run_functions_according_to_goal(goal, points_matrix);
+    run_functions_according_to_goal(goal, points_matrix, k);
 }
 
 /*******************************/
