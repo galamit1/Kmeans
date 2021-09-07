@@ -1,6 +1,6 @@
 #include "./utils.h"
 
-#define LINE_SIZE 1001 /*Given assumption each line is no more than 1000 characters*/
+#define LINE_SIZE 1001 /*Given assumption each line is no more than 1000 characters + \n character*/
 
 /**********************/
 /**TESTING ONLY - DON'T FORGET TO REMOVE**/
@@ -49,9 +49,8 @@ Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates
     return output;
 }
 
-/*Receives Matrix and prints it*/
+/*Receives Matrix and prints it - 4 decimal points*/
 void printMatrix (Matrix* m) {
-    double** cells;
     int i,j;
 
     printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
@@ -63,6 +62,8 @@ void printMatrix (Matrix* m) {
      }
 }
 
+
+/*Receives Matrix and prints it as is*/
 void printFullMatrix (Matrix* m) {
     double** cells;
     int i,j;
@@ -76,7 +77,7 @@ void printFullMatrix (Matrix* m) {
     }
 }
 
-/*Allocates memory and returns n*n zeros matrix, including memory allocation*/
+/*Recieves integer n, allocates memory and returns n*n zeros matrix, including memory allocation*/
 Matrix* getZerosMatrixSizeN (int n) {
     Matrix* zerosMatrix = malloc(sizeof(Matrix));
     assert (zerosMatrix != NULL); //TODO: add printf off error message
@@ -91,7 +92,25 @@ Matrix* getZerosMatrixSizeN (int n) {
     return zerosMatrix;
 }
 
-/*Allocates memory and returns n*n identity matrix*/
+Matrix* get_n_k_zero_matrix (int n, int k) {
+    Matrix* nk_matrix;
+    int i;
+
+    nk_matrix = malloc(sizeof(Matrix)); //TODO: add printf off error message
+    assert (nk_matrix != NULL);
+    /*initialize parameters, including n*k matrix with memory*/
+    nk_matrix -> rows = n;
+    nk_matrix -> cols = k;
+    nk_matrix -> cells = malloc(n * sizeof(double*));
+    assert (nk_matrix -> cells != NULL); //TODO: add printf off error message
+    for (i=0; i < n; i++) {
+        nk_matrix -> cells[i] = calloc(n, sizeof(double));
+        assert (nk_matrix -> cells[i] != NULL); //TODO: add printf off error message
+    }
+    return nk_matrix;
+}
+
+/*Recieves integer n, allocates memory and returns n*n identity matrix*/
 Matrix* getIdentitiyMatrixSizeN (int n) {
     int i;
     Matrix* identity;
@@ -108,21 +127,18 @@ Matrix* getIdentitiyMatrixSizeN (int n) {
 }
 
 /*Recieves symmetric matrix and returns Cell with largest absolute value (above diagonal)*/
-Cell* getCellWithLargestValue (Matrix* m) {
-    int i,j, currAbsoluteValue;
+void getCellWithLargestValue (Matrix* m, Cell* cell_pointer) {
+    int i,j;
+    double currAbsoluteValue;
     Cell* largestCell;
-    
     /*Initialize cell*/
-    largestCell = malloc(sizeof(Cell));
-    assert (largestCell != NULL); //TODO: add printf off error message
     largestCell -> row = -1;
     largestCell -> col = -1;
-    largestCell -> value = -INFINITY;
-
+    largestCell -> value = -MAXIMUM_DOUBLE;
     /*find largest absolute value and update largestCell accordingly*/
     for (i=0; i < m -> rows; i++) {
         for (j=i+1; j < m -> cols; j++) {
-            currAbsoluteValue = abs(m -> cells[i][j]);
+            currAbsoluteValue = fabs(m -> cells[i][j]);
             if (currAbsoluteValue > largestCell -> value) {
                 largestCell -> row = i;
                 largestCell -> col = j;
@@ -131,7 +147,9 @@ Cell* getCellWithLargestValue (Matrix* m) {
         }
     }
 
-    return largestCell;
+    cell_pointer -> row = largestCell -> row;
+    cell_pointer -> col = largestCell -> col;
+    cell_pointer -> value = largestCell -> value;
 }
 
 /*Recieves symmetric matrix and checks wether it's diagonal or not*/
@@ -148,10 +166,10 @@ int isDiagonalMatrix (Matrix* m) {
 }
 
 /*Recieves number and returns its sign*/
-int sign (double num) {
+double sign (double num) {
     if (num >= 0)
-        return 1;
-    return -1;
+        return 1.0;
+    return -1.0;
 }
 
 /*Recieves two n*n symmetric matrices, returns their product and frees up memory used by those 2 matrices */
@@ -186,6 +204,51 @@ void freeMatrixMemory (Matrix* m) {
     for (i=0; i < n; i++) {
             free(m -> cells[i]);
     }
+    free(m -> cells);
+    free(m);
+}
+
+/*Recieves matrix, allocates memory and returns copy of original matrix*/
+Matrix* get_copy_of_matrix(Matrix* original) {
+    Matrix* new_matrix;
+    int n;
+    int i,j;
+
+    new_matrix = get_n_k_zero_matrix(original -> rows, original -> cols);
+    /*Update values do be identical*/
+    for (i=0; i < original -> rows; i++) {
+        for (j=0; j < original -> cols; j++) {
+            new_matrix -> cells[i][j] = original -> cells[i][j];
+        }
+    }
+
+    return new_matrix;
+}
+
+/*Recieves matrix, allocates memory and returns a normalized matrix*/
+Matrix* normalize_matrix (Matrix* original) {
+    Matrix* normalized_matrix;
+    int i,j;
+    double current_row_squares_sum, sqrt_current_row_sum;
+
+    /*Start from copy of original matrix*/
+    normalized_matrix = get_copy_of_matrix(original);
+    /*Iterate rows*/
+    for (i=0; i < original -> rows; i++) {
+        /*Calculate row sum and the sqrt of it*/
+        current_row_squares_sum = 0;
+        for (j=0; j < original -> cols; j++) {
+            current_row_squares_sum += pow(original -> cells[i][j], 2);
+        }
+        sqrt_current_row_sum = sqrt(current_row_squares_sum);
+
+        /*Set normalized value for each row element accordingly*/
+        for (j=0; j < original -> cols; j++) {
+            normalized_matrix -> cells[i][j] = (original -> cells[i][j]) / sqrt_current_row_sum;
+        }
+    }
+
+    return normalized_matrix;
 }
 
 /**********************/

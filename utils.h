@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAXIMUM_DOUBLE 1.7E+308
+
 /**********************/
 /**STRUCT DEFINITIONS**/
 /**********************/
@@ -33,12 +35,15 @@ Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates
 void printMatrix (Matrix* m);
 void printFullMatrix (Matrix* m);
 Matrix* getZerosMatrixSizeN (int n);
+Matrix* get_n_k_zero_matrix (int n, int k);
 Matrix* getIdentitiyMatrixSizeN (int n);
-Cell* getCellWithLargestValue (Matrix* m);
+void getCellWithLargestValue (Matrix* m, Cell* cell_pointer);
 int isDiagonalMatrix (Matrix* m);
-int sign (double num);
+double sign (double num);
 Matrix* multiplyMatricesAndFreeMemory (Matrix* m1, Matrix* m2);
 void freeMatrixMemory (Matrix* m);
+Matrix* get_copy_of_matrix(Matrix* original);
+Matrix* normalize_matrix (Matrix* original);
 int getNumPoints(FILE *fptr);
 int getNumCoordinates(FILE *fptr);
 void getPointsFromFile (int numPoints, int numCoordinates, FILE *fptr, double** points);
