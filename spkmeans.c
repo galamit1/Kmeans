@@ -31,7 +31,7 @@ int run_functions_according_to_goal(char * goal, Matrix * points_matrix) {
         Matrix * ddg_matrix = run_ddg(wam_matrix);
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        printMatrix(lnorm_matrix);
+        printFullMatrix(lnorm_matrix);
 
         freeMatrixMemory(wam_matrix);
         freeMatrixMemory(ddg_matrix);
@@ -39,8 +39,24 @@ int run_functions_according_to_goal(char * goal, Matrix * points_matrix) {
         freeMatrixMemory(points_matrix);
         exit(0);
     }
-    else {
-        printf("Invalid input");
+    if (strcmp(goal, "jacobi") == 0) {
+        Matrix * wam_matrix = run_wam(points_matrix);
+        Matrix * ddg_matrix = run_ddg(wam_matrix);
+        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
+        Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
+        Matrix * jacobi_matrix = run_jacobi(lnorm_matrix);
+        printMatrix(jacobi_matrix);
+
+        freeMatrixMemory(wam_matrix);
+        freeMatrixMemory(ddg_matrix);
+        freeMatrixMemory(lnorm_matrix);
+        freeMatrixMemory(jacobi_matrix);
+        freeMatrixMemory(points_matrix);
+        exit(0);
+
+    }
+    if (run == 0) {
+        printf("Invalid input: goal is not in of the options");
     }
 
     /***clean all***/
