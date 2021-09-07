@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
         Matrix * ddg_matrix = run_ddg(wam_matrix);
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        printMatrix(lnorm_matrix);
+        printFullMatrix(lnorm_matrix);
 
         freeMatrixMemory(wam_matrix);
         freeMatrixMemory(ddg_matrix);

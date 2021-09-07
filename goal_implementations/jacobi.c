@@ -13,17 +13,29 @@
 
  int main () {
      Matrix* lnorm;
-     Matrix* lnorm_copy;
      Matrix* jacobi;
+     Matrix* T;
 
-     lnorm = get_points_matrix("./lnorm-example.txt");
-    //  printf("Original: \n");
-    //  printMatrix(lnorm); 
+     lnorm = get_points_matrix("./lnorm-example-after-1-iteration.txt");
 
     jacobi = run_jacobi(lnorm);
+    printf("*********************** \n");
+    printf("Final Jacobi U matrix is: \n");
     printMatrix(jacobi);
-    
-     return 0;
+    T = normalize_matrix(jacobi);
+    printf("*********************** \n");
+    printf("Final T matrix is: \n");
+    printMatrix(T);
+    printf("Finished printing final matrix\n");
+
+    freeMatrixMemory(lnorm);
+    printf("Finished freeing lnorm");
+    freeMatrixMemory(jacobi);
+    printf("Finished freeing Jacobi");
+    freeMatrixMemory(T);
+
+    printf("Bye Bye\n");
+    return 0;
  }
 
 /**********************/
@@ -38,41 +50,26 @@ Matrix* run_jacobi (Matrix* lnorm) {
     int* indexes_array;
     int n;
     int k;
-    int i;
+    int i,j;
 
     n = lnorm -> rows;
     /*allocate memory for eigenvalues array*/
     eigen_valus_array = (double*)malloc(n * sizeof(double));
     assert (eigen_valus_array != NULL); //TODO: add printf off error message
     /*get eigenvectors and update eigenvalues array accordingly*/
-    eigen_vectors_matrix = getEigenVectorsAndValues(lnorm, eigen_valus_array);
-    /*******DELETE******/
-    printf("FInal Eigenvectors matrix V is: \n");
-    printMatrix(eigen_vectors_matrix);
-    /*******DELETE******/
+    eigen_vectors_matrix = get_eigen_vectors_and_values(lnorm, eigen_valus_array);
     /*get initial indexes array i.e. [0,1,...,n-1] */
     indexes_array = get_initial_indexes_array(n);
     /*get eigengap k and preserve original indexes during sort*/
-    k = getEigenGapK(eigen_valus_array, indexes_array, n);
-
+    k = get_eigen_gap_k(eigen_valus_array, indexes_array, n);
     /*allocate memory for U - a n*k Matrix*/
-    final_U_matrix = malloc(sizeof(Matrix));
-    assert (final_U_matrix != NULL); //TODO: add printf off error message
-    /*initialize parameters, including n*k matrix with memory*/
-    final_U_matrix -> rows = n;
-    final_U_matrix -> cols = k;
-    final_U_matrix -> cells = malloc(n * sizeof(double*));
-    assert (final_U_matrix -> cells != NULL); //TODO: add printf off error message
-    for (i=0; i < n; i++) {
-        final_U_matrix -> cells[i] = (double*)malloc(k * sizeof(double*));
-        assert (final_U_matrix -> cells[i] != NULL); //TODO: add printf off error message
-    }
+    final_U_matrix = get_n_k_zero_matrix(n, k);
 
     /*point to k eigenvectors that correspond to k smallest eigenvalues*/
     for (i=0; i < k; i++) {
-        get_column_by_index(final_U_matrix, eigen_vectors_matrix, indexes_array[i], i, n);
+        get_column_by_index(final_U_matrix, eigen_vectors_matrix, i, indexes_array[i], n);
     }
-    
+
     return final_U_matrix;
 }
 
@@ -86,7 +83,7 @@ void get_column_by_index(Matrix* m1, Matrix* m2, int m1_index, int m2_index, int
 }
 
 /*Recieve eigenvalues array & initial indexes array, calculate k by eigengap heuristic and update indexes array along with sorting values array*/
-int getEigenGapK (double* eigen_valus_array, int* indexes_array, int array_length) {
+int get_eigen_gap_k (double* eigen_valus_array, int* indexes_array, int array_length) {
     double max_gap, current_gap;
     int max_index, current_index;
 
@@ -143,7 +140,6 @@ void bubble_sort_preserve_indexs(double* values, int* indexes, int array_length)
 int* get_initial_indexes_array (int n) {
     int* indexes_array;
     int i;
-
     /*allocate memory*/
     indexes_array = (int*)malloc(n * sizeof(int));
     assert (indexes_array != NULL); //TODO: add printf off error message
@@ -158,7 +154,7 @@ int* get_initial_indexes_array (int n) {
 }
 
 /*Receives symmetric matrix and empty array, returns n*n eigenvectors matrix (including memory allocation) and fills array accordingly in-place with corresponding eigenvalues*/
-Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigen_valus_array) {
+Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valus_array) {
     Matrix* current_A_matrix;
     Matrix* v_matrix;
     Matrix* current_P_matrix;
@@ -176,11 +172,11 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigen_valus_ar
     v_matrix = getIdentitiyMatrixSizeN(originalMatrix -> rows);
 
     a_previous_off = MAXIMUM_DOUBLE;
-    a_current_off = getOffDiagonalSumOfMatrix(current_A_matrix);
+    a_current_off = get_off_diagonal_sum_of_matrix(current_A_matrix);
     num_iterations = 0;
 
     while ((num_iterations < NUM_ITERATIONS) && (a_previous_off - a_current_off > EPSILON)) {
-        printf("Iteration number %d: \n", num_iterations);
+        printf("Iteration number %d: \n", num_iterations+1);
         /*calculte theta,t,c,s according to formula*/
         getCellWithLargestValue(current_A_matrix, largestNonDiagonalCell);
         i = largestNonDiagonalCell -> row;
@@ -189,29 +185,18 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigen_valus_ar
         t = sign(theta) / (fabs(theta) + sqrt(pow(theta,2) + 1));
         c = 1 / (sqrt(pow(t,2) + 1));
         s = t * c;
-        printf("Largest cell is: row = %d, col = %d, abs value = %f\n", largestNonDiagonalCell->row, largestNonDiagonalCell->col, largestNonDiagonalCell->value);
-        printf("Values are: s = %f, c = %f \n", s, c);
 
         /*Get P matrix according to c & s*/
-        current_P_matrix = getRotationMatrixForM(current_A_matrix, largestNonDiagonalCell, c, s);
-        printf("P matrix is: \n");
-        printFullMatrix(current_P_matrix);
+        current_P_matrix = get_rotation_matrix_for_m(current_A_matrix, largestNonDiagonalCell, c, s);
 
         /*Update V according to current P*/
         v_matrix = multiplyMatricesAndFreeMemory(v_matrix, current_P_matrix);
-        printf("V matrix is: \n");
-        printFullMatrix(v_matrix);
-
         
         /*Preform pivot step from A to A' and update Off values*/
-        current_A_matrix = preformPivotStepAndFreeMemory(current_A_matrix, i, j, c, s);
-        printf("A' matrix is: \n");
-        printFullMatrix(current_A_matrix);
-        printf("\n ======================== \n");
-
+        current_A_matrix = preform_pivot_step_and_free_memory(current_A_matrix, i, j, c, s);
         
         a_previous_off = a_current_off;
-        a_current_off = getOffDiagonalSumOfMatrix(current_A_matrix);
+        a_current_off = get_off_diagonal_sum_of_matrix(current_A_matrix);
 
         num_iterations++;
     }
@@ -227,7 +212,7 @@ Matrix* getEigenVectorsAndValues (Matrix* originalMatrix, double* eigen_valus_ar
 }   
 
 /*Preform pivot from A to A' according to input A,c,s,i,j and free memory of A*/
-Matrix* preformPivotStepAndFreeMemory (Matrix* A, int i, int j, double c, double s) {
+Matrix* preform_pivot_step_and_free_memory (Matrix* A, int i, int j, double c, double s) {
     Matrix* newA;
     int r;
 
@@ -256,7 +241,7 @@ Matrix* preformPivotStepAndFreeMemory (Matrix* A, int i, int j, double c, double
 }
 
 /*Recieves symmetric matrix m and returns sum of squares of all off-diagonal elements*/
-double getOffDiagonalSumOfMatrix (Matrix* m) {
+double get_off_diagonal_sum_of_matrix (Matrix* m) {
     int i,j;
     double sum = 0.0;
 
@@ -273,7 +258,7 @@ double getOffDiagonalSumOfMatrix (Matrix* m) {
 }
 
 /*Recieves symmetric matrix m and returns rotation matrix for m*/
-Matrix* getRotationMatrixForM (Matrix* m, Cell* largestNonDiagonalCell, double c, double s) {
+Matrix* get_rotation_matrix_for_m (Matrix* m, Cell* largestNonDiagonalCell, double c, double s) {
     Matrix* rotationMatrix;
     int i,j;
 

@@ -35,6 +35,7 @@ Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates
 void printMatrix (Matrix* m);
 void printFullMatrix (Matrix* m);
 Matrix* getZerosMatrixSizeN (int n);
+Matrix* get_n_k_zero_matrix (int n, int k);
 Matrix* getIdentitiyMatrixSizeN (int n);
 void getCellWithLargestValue (Matrix* m, Cell* cell_pointer);
 int isDiagonalMatrix (Matrix* m);
@@ -42,6 +43,7 @@ double sign (double num);
 Matrix* multiplyMatricesAndFreeMemory (Matrix* m1, Matrix* m2);
 void freeMatrixMemory (Matrix* m);
 Matrix* get_copy_of_matrix(Matrix* original);
+Matrix* normalize_matrix (Matrix* original);
 int getNumPoints(FILE *fptr);
 int getNumCoordinates(FILE *fptr);
 void getPointsFromFile (int numPoints, int numCoordinates, FILE *fptr, double** points);
