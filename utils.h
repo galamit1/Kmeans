@@ -31,6 +31,7 @@ typedef struct CellStruct {
 Matrix* get_points_matrix (char *path);
 Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates);
 void printMatrix (Matrix* m);
+void printFullMatrix (Matrix* m);
 Matrix* getZerosMatrixSizeN (int n);
 Matrix* getIdentitiyMatrixSizeN (int n);
 Cell* getCellWithLargestValue (Matrix* m);

@@ -63,6 +63,19 @@ void printMatrix (Matrix* m) {
      }
 }
 
+void printFullMatrix (Matrix* m) {
+    double** cells;
+    int i,j;
+
+    printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
+    for (i=0; i < m -> rows; i++) {
+        for (j=0; j < m -> cols - 1; j++) {
+            printf("%f,", m -> cells[i][j]);
+        }
+        printf("%f\n", m -> cells[i][j]);
+    }
+}
+
 /*Allocates memory and returns n*n zeros matrix, including memory allocation*/
 Matrix* getZerosMatrixSizeN (int n) {
     Matrix* zerosMatrix = malloc(sizeof(Matrix));
