@@ -30,7 +30,11 @@ int main(int argc, char **argv) {
         exit(1);
     }
     
-    points_matrix = get_points_matrix(filePath);
+    if ((points_matrix = get_points_matrix(filePath)) == NULL) {
+        printf("An Error Has Occured");
+        exit(1);
+    }
+
 //    numPoints = getNumPoints(file_ptr);
 //    numCoordinates = getNumCoordinates(file_ptr); //TODO calculate it together
 //    points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
@@ -49,7 +53,7 @@ int main(int argc, char **argv) {
     if (strcmp(goal, "wam") == 0) {
         Matrix * wam_matrix = run_wam(points_matrix);
         printMatrix(wam_matrix);
-        
+
         freeMatrixMemory(wam_matrix);
         freeMatrixMemory(points_matrix);
         exit(0);
