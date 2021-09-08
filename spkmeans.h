@@ -18,7 +18,7 @@
 
 
 int main(int argc, char **argv);
-int run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k);
+void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k);
 
 
 #endif //SPK_SPKMEANS_H

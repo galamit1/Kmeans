@@ -3,72 +3,10 @@
 #include "spkmeans.h"
 
 
-/*******************************/
-/*** Main Function ***/
-/*******************************/
-int run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k) {
-    if (strcmp(goal, "wam") == 0) {
-        Matrix * wam_matrix = run_wam(points_matrix);
-        print_matrix(wam_matrix);
-
-        free_matrix_memory(wam_matrix);
-        free_matrix_memory(points_matrix);
-        exit(0);
-    }
-    if (strcmp(goal, "ddg") == 0) {
-        Matrix * wam_matrix = run_wam(points_matrix);
-        Matrix * ddg_matrix = run_ddg(wam_matrix);
-        print_matrix(ddg_matrix);
-
-        free_matrix_memory(wam_matrix);
-        free_matrix_memory(ddg_matrix);
-        free_matrix_memory(points_matrix);
-        exit(0);
-    }
-    if (strcmp(goal, "lnorm") == 0) {
-        Matrix * wam_matrix = run_wam(points_matrix);
-        Matrix * ddg_matrix = run_ddg(wam_matrix);
-        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
-        Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        print_full_matrix(lnorm_matrix);
-
-        free_matrix_memory(wam_matrix);
-        free_matrix_memory(ddg_matrix);
-        free_matrix_memory(lnorm_matrix);
-        free_matrix_memory(points_matrix);
-        exit(0);
-    }
-    if (strcmp(goal, "jacobi") == 0) {
-        Matrix * wam_matrix = run_wam(points_matrix);
-        Matrix * ddg_matrix = run_ddg(wam_matrix);
-        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
-        Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        Matrix * jacobi_matrix = run_jacobi(lnorm_matrix);
-        print_matrix(jacobi_matrix);
-
-        free_matrix_memory(wam_matrix);
-        free_matrix_memory(ddg_matrix);
-        free_matrix_memory(lnorm_matrix);
-        free_matrix_memory(jacobi_matrix);
-        free_matrix_memory(points_matrix);
-        exit(0);
-
-    }
-    // if (run == 0) {
-    //     printf("Invalid input: goal is not in of the options");
-    // }
-
-    /***clean all***/
-    free_matrix_memory(points_matrix);
-}
-
-
-
 int main(int argc, char **argv) {
     int k;
     char goal[7];
     char filePath[1000];
-
     Matrix * points_matrix;
 
     if (argc != 4) {
@@ -89,16 +27,34 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-//    numPoints = get_num_points(file_ptr);
-//    numCoordinates = get_num_coordinates(file_ptr); //TODO calculate it together
-//    points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
-
-    if (k == 0) //TODO the huristic
+    if ((k == 0) && ((strcmp(goal, "spk")) || (strcmp(goal, "jacobi"))))
     {
-        k=0;
+        Matrix * wam_matrix = run_wam(points_matrix);
+        Matrix * ddg_matrix = run_ddg(wam_matrix);
+        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
+        Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
+        Matrix* U_matrix = run_jacobi(lnorm_matrix);
+        Matrix* T_matrix = normalize_matrix(U_matrix);
+
+        if (strcmp(goal, "spk") == 0) {
+            k = T_matrix->cols;
+            run_spk(T_matrix, k);
+        }
+        if (strcmp(goal, "jacobi") == 0) {
+            print_matrix(T_matrix);
+        }
+
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(ddg_matrix);
+        free_matrix_memory(lnorm_matrix);
+        free_matrix_memory(U_matrix);
+        free_matrix_memory(T_matrix);
+        free_matrix_memory(points_matrix);
+        exit(0);
     }
 
-    if (k >= points_matrix->rows) { //TODO > or >=?
+    if (k >= points_matrix->rows) { // so that k < number of points
+        printf("Invalid Input!");
         free_matrix_memory(points_matrix);
         exit(1);
     }
