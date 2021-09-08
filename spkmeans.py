@@ -40,12 +40,10 @@ def run_spk(points, k, goal):
 
 def main():
     k, goal, points = get_arguments()
-    print(goal)
     if goal == "spk" and k != 0: # I'm not sure about the k != 0
         run_spk(points, k, goal)
     else:
         myspkmeans.run_module(points, goal, len(points), len(points[0]))
-        print("Finished")
 
 if __name__ == '__main__':
     main()

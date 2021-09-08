@@ -157,8 +157,6 @@ Matrix* get_matrix_from_2D_array (double** points, int num_points, int num_coord
 /*Receives Matrix and prints it - 4 decimal points*/
 void print_matrix (Matrix* m) {
     int i,j;
-
-    printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
     for (i=0; i < m -> rows; i++) {
         for (j=0; j < m -> cols - 1; j++) {
             if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) printf("%.4f,", m -> cells[i][j] * (-1));
@@ -173,8 +171,6 @@ void print_matrix (Matrix* m) {
 /*Receives Matrix and prints it as is*/
 void print_full_matrix (Matrix* m) {
     int i,j;
-
-    printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
     for (i=0; i < m -> rows; i++) {
         for (j=0; j < m -> cols - 1; j++) {
             printf("%f,", m -> cells[i][j]);
