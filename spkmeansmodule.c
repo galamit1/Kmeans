@@ -1,11 +1,15 @@
-//
-// Created by galam on 08/09/2021.
-//
-
 #define PY_SSIZE_T_CLEAN
-#include <python.h>
-#include "spkmeansmodule.h"
+#include <Python.h>
 #include "spkmeans.h"
+
+#define KMEANS_EPSILON 0.001
+
+/*** Function Declaration ***/
+static PyObject* c_kmeans(PyObject* self, PyObject* args);
+static PyObject* c_spk(PyObject *self, PyObject *args);
+int python_list_of_lists_to_2D_array (PyObject *python_list_of_lists, double **target_array);
+Cluster** python_init_k_clusters (int k);
+PyMODINIT_FUNC PyInit_myspkmeans(void);
 
 
 /*******************************/
