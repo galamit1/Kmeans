@@ -159,11 +159,19 @@ void print_matrix (Matrix* m) {
     int i,j;
     for (i=0; i < m -> rows; i++) {
         for (j=0; j < m -> cols - 1; j++) {
-            if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) printf("%.4f,", m -> cells[i][j] * (-1));
-            else printf("%.4f,", m -> cells[i][j]);
+            if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) {
+                printf("%.4f,", m->cells[i][j] * (-1));
+            }
+            else {
+                printf("%.4f,", m -> cells[i][j]);
+            }
          }
-         if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) printf("%.4f\n", m -> cells[i][j] * (-1));
-         printf("%.4f\n", m -> cells[i][j]);
+         if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) {
+             printf("%.4f\n", m -> cells[i][j] * (-1));
+         }
+         else {
+             printf("%.4f\n", m -> cells[i][j]);
+         }
      }
 }
 
