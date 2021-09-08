@@ -88,7 +88,7 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
         Matrix * ddg_matrix = run_ddg(wam_matrix);
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        print_full_matrix(lnorm_matrix);
+        print_matrix(lnorm_matrix);
 
         free_matrix_memory(wam_matrix);
         free_matrix_memory(ddg_matrix);
@@ -207,7 +207,7 @@ void print_matrix (Matrix* m) {
     printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
     for (i=0; i < m -> rows; i++) {
         for (j=0; j < m -> cols - 1; j++) {
-            if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) printf("%.4f", m -> cells[i][j] * (-1));
+            if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) printf("%.4f,", m -> cells[i][j] * (-1));
             else printf("%.4f,", m -> cells[i][j]);
          }
          if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) printf("%.4f\n", m -> cells[i][j] * (-1));

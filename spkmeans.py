@@ -18,13 +18,13 @@ def get_arguments():
     file_name = sys.argv[3]
     with open(file_name, 'r') as f:
         data = f.read()
-    points = [[float(num) for num in row.split(COORDINATES_SEPARATOR)] for row in data.split(POINTS_SEPARATOR)]
-    if k >= len(points):
-        print("Invalid Input!")
-        raise Exception
+    points = [[float(num.strip()) for num in row.split(COORDINATES_SEPARATOR)] for row in data.split(POINTS_SEPARATOR)]
     return k, goal, points
 
 def run_spk(points, k, goal):
+    if k >= len(points):
+        print("Invalid Input!")
+        raise Exception
     points = np.array(points)
     np.random.seed(0)
     points_num = points.shape[0]
@@ -43,23 +43,11 @@ def run_spk(points, k, goal):
 
 
 def main():
-    try:
-        k, goal, points = get_arguments()
-    except:
-        print("Invalid Input!")
-        return
-
-    result = []
-    if goal == "spk":
+    k, goal, points = get_arguments()
+    if goal == "spk" and k != 0: # I'm not sure about the k != 0
         run_spk(points, k, goal)
     else:
         myspkmeans.fit(points, goal, len(points), len(points[0]))
-
-    output = POINTS_SEPARATOR.join(
-        [COORDINATES_SEPARATOR.join(["{:.4f}".format(round(i, 4)) for i in c]) for c in result])
-    print(output)
-    return output
-
 
 if __name__ == '__main__':
     main()
