@@ -287,6 +287,7 @@ void multiply_matrices_to_existing_pointer (Matrix* m1, Matrix* m2, Matrix* prod
     /*preform regular matrix multiplication - store result in product*/
     for (i=0; i < product -> rows; i++) {
         for (j=0; j < product -> rows; j++) {
+            product -> cells[i][j] = 0;
             for (k=0; k < product -> rows; k++) {
                 product -> cells[i][j] += (m1 -> cells[i][k])*(m2 -> cells[k][j]);
             }
