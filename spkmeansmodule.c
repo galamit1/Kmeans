@@ -179,8 +179,7 @@ static struct PyModuleDef _moduledef  = {
         _methods
 };
 
-PyMODINIT_FUNC
-PyInit_myspkmeans(void)
+PyMODINIT_FUNC PyInit_myspkmeans(void)
 {
     PyObject *m;
     m = PyModule_Create(&_moduledef);

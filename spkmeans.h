@@ -1,11 +1,11 @@
+#ifndef SPK_SPKMEANS_H
+#define SPK_SPKMEANS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include <math.h>
-
-#ifndef SPK_SPKMEANS_H
-#define SPK_SPKMEANS_H
 
 #define LINE_SIZE 1001 /*Given assumption each line is no more than 1000 characters + \n character*/
 #define MAXIMUM_DOUBLE 1.7E+308

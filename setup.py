@@ -6,18 +6,13 @@ setup(
     author='Gal and Ben',
     description='CPython API',
     install_requires=['invoke',
-                      'numpy',
                       'pandas',
-                      'matplotlib',
                       ],
     packages=find_packages(),
     license='GPL-2',
     ext_modules=[
-        # Extension(
-        #     'mykmeanssp', ['kmeans.c'],
-        # ),
         Extension(
-            'myspkmeans', [ 'spkmeans.c'],
+            'myspkmeans', ['spkmeansmodule.c', 'spkmeans.c'],
         )
     ],
     headers=['spkmeansmodule.h', 'spkmeans.h']

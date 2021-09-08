@@ -1,11 +1,7 @@
-//
-// Created by galam on 08/09/2021.
-//
-#include "spkmeans.c"
-
 #ifndef SPK_SPKMEANSMODULE_H
 #define SPK_SPKMEANSMODULE_H
 
+#include "spkmeans.h"
 #define KMEANS_EPSILON 0.001
 
 /*** Function Declaration ***/
