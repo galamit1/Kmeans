@@ -5,7 +5,7 @@
 #include "./jacobi.h"
 
 #define EPSILON 1.0e-15
-#define NUM_ITERATIONS 20
+#define NUM_ITERATIONS 100
 
 /**********************/
 /**TESTING ONLY - DON'T FORGET TO REMOVE**/
@@ -16,7 +16,7 @@
      Matrix* jacobi;
      Matrix* T;
 
-     lnorm = get_points_matrix("./lnorm-example-after-1-iteration.txt");
+     lnorm = get_points_matrix("./lnorm-example.txt");
 
     jacobi = run_jacobi(lnorm);
     printf("*********************** \n");
@@ -176,7 +176,7 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     num_iterations = 0;
 
     while ((num_iterations < NUM_ITERATIONS) && (a_previous_off - a_current_off > EPSILON)) {
-        printf("\n\nIteration number %d: \n", num_iterations+3);
+        printf("\n\nIteration number %d: \n", num_iterations+1);
         /*calculte theta,t,c,s according to formula*/
         get_cell_with_largest_value(current_A_matrix, largest_non_diagonal_cell);
         i = largest_non_diagonal_cell -> row;
@@ -188,6 +188,9 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
 
         /*Get P matrix according to c & s*/
         current_P_matrix = get_rotation_matrix_for_m(current_A_matrix, largest_non_diagonal_cell, c, s);
+
+        // printf("\nP matrix is: \n");
+        // print_matrix(current_P_matrix);
 
         /*Update V according to current P*/
         v_matrix = multiply_matrices_and_free_memory(v_matrix, current_P_matrix);
