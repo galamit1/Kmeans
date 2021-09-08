@@ -14,7 +14,6 @@
 
 static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
     /*Define variables to receive from user*/
-    int k;
     int max_iter = 300;
     char *goal;
     int num_points;
@@ -44,12 +43,14 @@ static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
     }
     if ((points_matrix = malloc(sizeof(Matrix))) == NULL) {
         printf("An Error Has Occured");
+        return NULL;
     }
 
     points_matrix->rows = num_points;
     points_matrix->cols = num_coordinates;
     points_matrix->cells = points;
-    run_functions_according_to_goal(goal, points_matrix, k);
+    run_functions_according_to_goal(goal, points_matrix, 1);
+    return NULL;
 }
 
 /*******************************/

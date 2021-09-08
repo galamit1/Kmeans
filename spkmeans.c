@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
     if (argc != 4) {
         printf("Invalid Input!");
-        exit(1);
+        return 1;
     }
     sscanf(argv[1], "%d", &k);
     sscanf(argv[2], "%s", goal);
@@ -21,12 +21,12 @@ int main(int argc, char **argv) {
 
     if (k < 0) {
         printf("Invalid Input!");
-        exit(1);
+        return 1;
     }
 
     if ((points_matrix = get_points_matrix(filePath)) == NULL) {
         printf("An Error Has Occured");
-        exit(1);
+        return 1;
     }
 
     if ((k == 0) && ((strcmp(goal, "spk")) || (strcmp(goal, "jacobi"))))
@@ -55,17 +55,16 @@ int main(int argc, char **argv) {
         }
 
         
-        free_matrix_memory(lnorm_matrix); printf("free1"); fflush(stdout);
-        free_matrix_memory(U_matrix); printf("free2");fflush(stdout);
-        free_matrix_memory(T_matrix);printf("free3");fflush(stdout);
-        free_matrix_memory(points_matrix);printf("free4");fflush(stdout);
-        exit(0);
+        free_matrix_memory(lnorm_matrix);
+        free_matrix_memory(U_matrix);
+        free_matrix_memory(T_matrix);
+        free_matrix_memory(points_matrix);
     }
 
     if (k >= points_matrix->rows) { /*so that k < number of points*/
         printf("Invalid Input!");
         free_matrix_memory(points_matrix);
-        exit(1);
+        return 1;
     }
     run_functions_according_to_goal(goal, points_matrix, k);
     return 0;
@@ -133,10 +132,7 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
         printf("Invalid input");
     }
 
-    /***clean all***/
     free_matrix_memory(points_matrix);
-
-    printf("finish c");
 }
 
 /**********************/
