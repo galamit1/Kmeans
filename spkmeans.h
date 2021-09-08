@@ -51,6 +51,7 @@ void get_cell_with_largest_value (Matrix* m, Cell* cell_pointer);
 int is_diagonal_matrix (Matrix* m);
 double sign (double num);
 Matrix* multiply_matrices_and_free_memory (Matrix* m1, Matrix* m2);
+void multiply_matrices_to_existing_pointer (Matrix* m1, Matrix* m2, Matrix* product);
 void free_matrix_memory (Matrix* m);
 Matrix* get_copy_of_matrix(Matrix* original);
 Matrix* normalize_matrix (Matrix* original);

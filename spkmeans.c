@@ -35,6 +35,8 @@ int main(int argc, char **argv) {
         Matrix * ddg_matrix = run_ddg(wam_matrix);
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(ddg_matrix);
         Matrix* U_matrix = run_jacobi(lnorm_matrix);
         Matrix* T_matrix = normalize_matrix(U_matrix);
 
@@ -46,12 +48,11 @@ int main(int argc, char **argv) {
             print_matrix(T_matrix);
         }
 
-        free_matrix_memory(wam_matrix);
-        free_matrix_memory(ddg_matrix);
-        free_matrix_memory(lnorm_matrix);
-        free_matrix_memory(U_matrix);
-        free_matrix_memory(T_matrix);
-        free_matrix_memory(points_matrix);
+        
+        free_matrix_memory(lnorm_matrix); printf("free1"); fflush(stdout);
+        free_matrix_memory(U_matrix); printf("free2");fflush(stdout);
+        free_matrix_memory(T_matrix);printf("free3");fflush(stdout);
+        free_matrix_memory(points_matrix);printf("free4");fflush(stdout);
         exit(0);
     }
 
@@ -140,6 +141,7 @@ void print_matrix (Matrix* m) {
          if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) printf("%.4f\n", m -> cells[i][j] * (-1));
          printf("%.4f\n", m -> cells[i][j]);
      }
+    // fflush(stdout);
 }
 
 
@@ -268,12 +270,26 @@ Matrix* multiply_matrices_and_free_memory (Matrix* m1, Matrix* m2) {
             }
         }
     }
-
+    
     /*free memory of original matrices*/
     free_matrix_memory(m1);
     free_matrix_memory(m2);
 
     return product;
+}
+
+/*Recieves 3 n*n symmetric matrices, multiplies first 2 and stores the result in product*/
+void multiply_matrices_to_existing_pointer (Matrix* m1, Matrix* m2, Matrix* product) {
+    int i,j, k;
+
+    /*preform regular matrix multiplication - store result in product*/
+    for (i=0; i < product -> rows; i++) {
+        for (j=0; j < product -> rows; j++) {
+            for (k=0; k < product -> rows; k++) {
+                product -> cells[i][j] += (m1 -> cells[i][k])*(m2 -> cells[k][j]);
+            }
+        }
+    }
 }
 
 /*Recieves symmetric matrix and frees its memory*/
@@ -632,6 +648,7 @@ int* get_initial_indexes_array (int n) {
 Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valus_array) {
     Matrix* current_A_matrix;
     Matrix* v_matrix;
+    Matrix* temp_v_matrix;
     Matrix* current_P_matrix;
     double a_current_off, a_previous_off;
     int num_iterations, i, j;
@@ -651,8 +668,7 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     num_iterations = 0;
 
     while ((num_iterations < NUM_ITERATIONS) && (a_previous_off - a_current_off > EPSILON)) {
-            /*TODO: remove!*/
-        printf("\n\nIteration number %d: \n", num_iterations);
+        fflush(stdout);
         /*calculte theta,t,c,s according to formula*/
         get_cell_with_largest_value(current_A_matrix, largest_non_diagonal_cell);
         i = largest_non_diagonal_cell -> row;
@@ -664,9 +680,14 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
 
         /*Get P matrix according to c & s*/
         current_P_matrix = get_rotation_matrix_for_m(current_A_matrix, largest_non_diagonal_cell, c, s);
+        temp_v_matrix = get_copy_of_matrix(v_matrix);
 
         /*Update V according to current P*/
-        v_matrix = multiply_matrices_and_free_memory(v_matrix, current_P_matrix);
+        // v_matrix = multiply_matrices_and_free_memory(v_matrix, current_P_matrix);
+        multiply_matrices_to_existing_pointer(temp_v_matrix, current_P_matrix, v_matrix);
+
+        free_matrix_memory(temp_v_matrix);
+        free_matrix_memory(current_P_matrix);
         
         /*Preform pivot step from A to A' and update Off values*/
         current_A_matrix = preform_pivot_step_and_free_memory(current_A_matrix, i, j, c, s);
