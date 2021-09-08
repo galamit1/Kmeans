@@ -279,7 +279,7 @@ int update_all_clusters (Cluster** clusters, int k, int num_coordinates) {
         total_update += update_cluster_centroids_and_sum (clusters[i], num_coordinates);
     }
 
-    if (total_update < EPSILON) {
+    if (total_update < KMEANS_EPSILON) {
         /*no update was made*/
         return 1;
     }
@@ -316,7 +316,6 @@ void free_points_memory (double** points, int num_points) {
         free(points[i]);
     }
 }
-
 
 double get_distance (Cluster* cluster, const double* point, int num_coordinates) {
     /*

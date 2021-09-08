@@ -5,9 +5,8 @@
 #ifndef SPK_KMEANS_H
 #define SPK_KMEANS_H
 
-#include <Python.h>
 #include ".\cluster.h"
-#define EPSILON 0.001
+#define KMEANS_EPSILON 0.001
 
 /*** Function Declaration ***/
 static PyObject* c_kmeans(PyObject* self, PyObject* args);
