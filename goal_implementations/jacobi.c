@@ -5,7 +5,7 @@
 #include "./jacobi.h"
 
 #define EPSILON 1.0e-15
-#define NUM_ITERATIONS 100
+#define NUM_ITERATIONS 20
 
 /**********************/
 /**TESTING ONLY - DON'T FORGET TO REMOVE**/
@@ -21,18 +21,18 @@
     jacobi = run_jacobi(lnorm);
     printf("*********************** \n");
     printf("Final Jacobi U matrix is: \n");
-    printMatrix(jacobi);
+    print_matrix(jacobi);
     T = normalize_matrix(jacobi);
     printf("*********************** \n");
     printf("Final T matrix is: \n");
-    printMatrix(T);
+    print_matrix(T);
     printf("Finished printing final matrix\n");
 
-    freeMatrixMemory(lnorm);
+    free_matrix_memory(lnorm);
     printf("Finished freeing lnorm");
-    freeMatrixMemory(jacobi);
+    free_matrix_memory(jacobi);
     printf("Finished freeing Jacobi");
-    freeMatrixMemory(T);
+    free_matrix_memory(T);
 
     printf("Bye Bye\n");
     return 0;
@@ -161,36 +161,38 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     double a_current_off, a_previous_off;
     int num_iterations, i, j;
     double theta,t,c,s;
-    Cell* largestNonDiagonalCell;
+    Cell* largest_non_diagonal_cell;
 
-    largestNonDiagonalCell = (Cell*)malloc(sizeof(Cell*));
-    assert (largestNonDiagonalCell != NULL); //TODO: add printf off error message
+    largest_non_diagonal_cell = (Cell*)malloc(sizeof(Cell*));
+    assert (largest_non_diagonal_cell != NULL); //TODO: add printf off error message
 
     /*Start with input matrix as A*/
     current_A_matrix = originalMatrix;
     /*Initialize V to be identity matrix - agnostic to matrix multiplication*/
-    v_matrix = getIdentitiyMatrixSizeN(originalMatrix -> rows);
+    v_matrix = get_identity_matrix_size_n(originalMatrix -> rows);
 
     a_previous_off = MAXIMUM_DOUBLE;
     a_current_off = get_off_diagonal_sum_of_matrix(current_A_matrix);
     num_iterations = 0;
 
     while ((num_iterations < NUM_ITERATIONS) && (a_previous_off - a_current_off > EPSILON)) {
-        printf("Iteration number %d: \n", num_iterations+1);
+        printf("\n\nIteration number %d: \n", num_iterations+3);
         /*calculte theta,t,c,s according to formula*/
-        getCellWithLargestValue(current_A_matrix, largestNonDiagonalCell);
-        i = largestNonDiagonalCell -> row;
-        j = largestNonDiagonalCell -> col;
+        get_cell_with_largest_value(current_A_matrix, largest_non_diagonal_cell);
+        i = largest_non_diagonal_cell -> row;
+        j = largest_non_diagonal_cell -> col;
         theta = (current_A_matrix -> cells[j][j] - current_A_matrix -> cells[i][i]) / (2 * current_A_matrix -> cells[i][j]);
         t = sign(theta) / (fabs(theta) + sqrt(pow(theta,2) + 1));
         c = 1 / (sqrt(pow(t,2) + 1));
         s = t * c;
 
         /*Get P matrix according to c & s*/
-        current_P_matrix = get_rotation_matrix_for_m(current_A_matrix, largestNonDiagonalCell, c, s);
+        current_P_matrix = get_rotation_matrix_for_m(current_A_matrix, largest_non_diagonal_cell, c, s);
 
         /*Update V according to current P*/
-        v_matrix = multiplyMatricesAndFreeMemory(v_matrix, current_P_matrix);
+        v_matrix = multiply_matrices_and_free_memory(v_matrix, current_P_matrix);
+        printf("Current V matrix is: \n");
+        print_matrix(v_matrix);
         
         /*Preform pivot step from A to A' and update Off values*/
         current_A_matrix = preform_pivot_step_and_free_memory(current_A_matrix, i, j, c, s);
@@ -201,7 +203,10 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
         num_iterations++;
     }
 
-    free(largestNonDiagonalCell); /*Largest cell data is un-needed from this point, so free the memory space allocated by getCellWithLargestValue*/
+    printf("\n\nFinal A matrix is:\n");
+    print_matrix(current_A_matrix);
+
+    free(largest_non_diagonal_cell); /*Largest cell data is un-needed from this point, so free the memory space allocated by get_cell_with_largest_value*/
 
     /*Update the eigenValues in array in-place*/
     for (i=0; i < current_A_matrix -> rows; i++) {
@@ -235,7 +240,7 @@ Matrix* preform_pivot_step_and_free_memory (Matrix* A, int i, int j, double c, d
     newA -> cells[j][i] = 0;
 
     /*Free memory of original A*/
-    freeMatrixMemory(A);
+    free_matrix_memory(A);
 
     return newA;
 }
@@ -258,21 +263,21 @@ double get_off_diagonal_sum_of_matrix (Matrix* m) {
 }
 
 /*Recieves symmetric matrix m and returns rotation matrix for m*/
-Matrix* get_rotation_matrix_for_m (Matrix* m, Cell* largestNonDiagonalCell, double c, double s) {
-    Matrix* rotationMatrix;
+Matrix* get_rotation_matrix_for_m (Matrix* m, Cell* largest_non_diagonal_cell, double c, double s) {
+    Matrix* rotation_matrix;
     int i,j;
 
     /*start with identity matrix*/
-    rotationMatrix = getIdentitiyMatrixSizeN(m -> rows);
+    rotation_matrix = get_identity_matrix_size_n(m -> rows);
 
-    i = largestNonDiagonalCell -> row;
-    j = largestNonDiagonalCell -> col;
+    i = largest_non_diagonal_cell -> row;
+    j = largest_non_diagonal_cell -> col;
     
     /*set correlating cells to c, s  & -s*/
-    rotationMatrix -> cells[i][i] = c;
-    rotationMatrix -> cells[i][j] = s;
-    rotationMatrix -> cells[j][j] = c;
-    rotationMatrix -> cells[j][i] = s*(-1);
+    rotation_matrix -> cells[i][i] = c;
+    rotation_matrix -> cells[i][j] = s;
+    rotation_matrix -> cells[j][j] = c;
+    rotation_matrix -> cells[j][i] = s*(-1);
 
-    return rotationMatrix;
+    return rotation_matrix;
 }

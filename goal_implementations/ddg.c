@@ -5,7 +5,7 @@
 #include "ddg.h"
 
 Matrix * run_ddg(Matrix * wam) {
-    Matrix * ddg_matrix = getZerosMatrixSizeN(wam->rows);
+    Matrix * ddg_matrix = get_zeros_matrix_size_n(wam->rows);
     double row_sum;
     for (int i=0; i < wam->rows; i++) {
         row_sum = 0;

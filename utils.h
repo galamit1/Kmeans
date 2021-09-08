@@ -31,22 +31,22 @@ typedef struct CellStruct {
 /**********************/
 
 Matrix* get_points_matrix (char *path);
-Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates);
-void printMatrix (Matrix* m);
-void printFullMatrix (Matrix* m);
-Matrix* getZerosMatrixSizeN (int n);
+Matrix* get_matrix_from_2D_array (double** points, int num_points, int num_coordinates);
+void print_matrix (Matrix* m);
+void print_full_matrix (Matrix* m);
+Matrix* get_zeros_matrix_size_n (int n);
 Matrix* get_n_k_zero_matrix (int n, int k);
-Matrix* getIdentitiyMatrixSizeN (int n);
-void getCellWithLargestValue (Matrix* m, Cell* cell_pointer);
-int isDiagonalMatrix (Matrix* m);
+Matrix* get_identity_matrix_size_n (int n);
+void get_cell_with_largest_value (Matrix* m, Cell* cell_pointer);
+int is_diagonal_matrix (Matrix* m);
 double sign (double num);
-Matrix* multiplyMatricesAndFreeMemory (Matrix* m1, Matrix* m2);
-void freeMatrixMemory (Matrix* m);
+Matrix* multiply_matrices_and_free_memory (Matrix* m1, Matrix* m2);
+void free_matrix_memory (Matrix* m);
 Matrix* get_copy_of_matrix(Matrix* original);
 Matrix* normalize_matrix (Matrix* original);
-int getNumPoints(FILE *fptr);
-int getNumCoordinates(FILE *fptr);
-void getPointsFromFile (int numPoints, int numCoordinates, FILE *fptr, double** points);
-void singleLineToPoint (double* point, char* singleLine);
+int get_num_points(FILE *fptr);
+int get_num_coordinates(FILE *fptr);
+void get_points_from_file (int num_points, int num_coordinates, FILE *fptr, double** points);
+void single_line_to_point (double* point, char* single_line);
 
 #endif //SPK_SPKMEANSMODULE_H

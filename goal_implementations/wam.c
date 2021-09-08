@@ -6,7 +6,7 @@
 
 
 Matrix * run_wam(Matrix * points) {
-    Matrix * wam_matrix = getZerosMatrixSizeN(points->rows);
+    Matrix * wam_matrix = get_zeros_matrix_size_n(points->rows);
     double weight;
     for (int i=0; i < points->rows; i++) {
         for (int j = i + 1; j < points->rows; j++) {

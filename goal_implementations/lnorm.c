@@ -5,7 +5,7 @@
 #include "lnorm.h"
 
 Matrix * run_lnorm(Matrix * wam, Matrix * ddg) {
-    Matrix * lnorm = getIdentitiyMatrixSizeN(wam->rows);
+    Matrix * lnorm = get_identity_matrix_size_n(wam->rows);
     double value;
     for (int i = 0; i < wam->rows; ++i) {
         for (int j = i + 1; j < wam->rows; ++j) {

@@ -1,28 +1,28 @@
 #define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#include <python.h>
 #include "spkmeans.h"
 
 
 /*******************************/
 /*** Main Function ***/
 /*******************************/
-int run_functions_according_to_goal(char * goal, Matrix * points_matrix) {
+int run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k) {
     if (strcmp(goal, "wam") == 0) {
         Matrix * wam_matrix = run_wam(points_matrix);
-        printMatrix(wam_matrix);
+        print_matrix(wam_matrix);
 
-        freeMatrixMemory(wam_matrix);
-        freeMatrixMemory(points_matrix);
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(points_matrix);
         exit(0);
     }
     if (strcmp(goal, "ddg") == 0) {
         Matrix * wam_matrix = run_wam(points_matrix);
         Matrix * ddg_matrix = run_ddg(wam_matrix);
-        printMatrix(ddg_matrix);
+        print_matrix(ddg_matrix);
 
-        freeMatrixMemory(wam_matrix);
-        freeMatrixMemory(ddg_matrix);
-        freeMatrixMemory(points_matrix);
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(ddg_matrix);
+        free_matrix_memory(points_matrix);
         exit(0);
     }
     if (strcmp(goal, "lnorm") == 0) {
@@ -30,12 +30,12 @@ int run_functions_according_to_goal(char * goal, Matrix * points_matrix) {
         Matrix * ddg_matrix = run_ddg(wam_matrix);
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        printFullMatrix(lnorm_matrix);
+        print_full_matrix(lnorm_matrix);
 
-        freeMatrixMemory(wam_matrix);
-        freeMatrixMemory(ddg_matrix);
-        freeMatrixMemory(lnorm_matrix);
-        freeMatrixMemory(points_matrix);
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(ddg_matrix);
+        free_matrix_memory(lnorm_matrix);
+        free_matrix_memory(points_matrix);
         exit(0);
     }
     if (strcmp(goal, "jacobi") == 0) {
@@ -44,22 +44,22 @@ int run_functions_according_to_goal(char * goal, Matrix * points_matrix) {
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
         Matrix * jacobi_matrix = run_jacobi(lnorm_matrix);
-        printMatrix(jacobi_matrix);
+        print_matrix(jacobi_matrix);
 
-        freeMatrixMemory(wam_matrix);
-        freeMatrixMemory(ddg_matrix);
-        freeMatrixMemory(lnorm_matrix);
-        freeMatrixMemory(jacobi_matrix);
-        freeMatrixMemory(points_matrix);
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(ddg_matrix);
+        free_matrix_memory(lnorm_matrix);
+        free_matrix_memory(jacobi_matrix);
+        free_matrix_memory(points_matrix);
         exit(0);
 
     }
-    if (run == 0) {
-        printf("Invalid input: goal is not in of the options");
-    }
+    // if (run == 0) {
+    //     printf("Invalid input: goal is not in of the options");
+    // }
 
     /***clean all***/
-    freeMatrixMemory(points_matrix);
+    free_matrix_memory(points_matrix);
 }
 
 
@@ -89,8 +89,8 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-//    numPoints = getNumPoints(file_ptr);
-//    numCoordinates = getNumCoordinates(file_ptr); //TODO calculate it together
+//    numPoints = get_num_points(file_ptr);
+//    numCoordinates = get_num_coordinates(file_ptr); //TODO calculate it together
 //    points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
 
     if (k == 0) //TODO the huristic
@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
     }
 
     if (k >= points_matrix->rows) { //TODO > or >=?
-        freeMatrixMemory(points_matrix);
+        free_matrix_memory(points_matrix);
         exit(1);
     }
     run_functions_according_to_goal(goal, points_matrix, k);
@@ -112,18 +112,18 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     if (strcmp(goal, "wam") == 0) {
         run = 1;
         Matrix * wam_matrix = run_wam(points_matrix);
-        printMatrix(wam_matrix);
+        print_matrix(wam_matrix);
 
-        freeMatrixMemory(wam_matrix);
+        free_matrix_memory(wam_matrix);
     }
     if (strcmp(goal, "ddg") == 0) {
         run = 1;
         Matrix * wam_matrix = run_wam(points_matrix);
         Matrix * ddg_matrix = run_ddg(wam_matrix);
-        printMatrix(ddg_matrix);
+        print_matrix(ddg_matrix);
 
-        freeMatrixMemory(wam_matrix);
-        freeMatrixMemory(ddg_matrix);
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(ddg_matrix);
     }
     if (strcmp(goal, "lnorm") == 0) {
         run = 1;
@@ -131,11 +131,11 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
         Matrix * ddg_matrix = run_ddg(wam_matrix);
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         Matrix * lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        printFullMatrix(lnorm_matrix);
+        print_full_matrix(lnorm_matrix);
 
-        freeMatrixMemory(wam_matrix);
-        freeMatrixMemory(ddg_matrix);
-        freeMatrixMemory(lnorm_matrix);
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(ddg_matrix);
+        free_matrix_memory(lnorm_matrix);
     }
     if (strcmp(goal, "spk") == 0) {
         run = 1;
@@ -147,7 +147,7 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     }
 
     /***clean all***/
-    freeMatrixMemory(points_matrix);
+    free_matrix_memory(points_matrix);
 }
 
 

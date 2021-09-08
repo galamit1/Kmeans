@@ -7,7 +7,7 @@
 /**********************/
 
 // int main () {
-//     int numPoints, numCoordinates;
+//     int num_points, num_coordinates;
 //     FILE* file_ptr;
 //     double ** points;
 //     int i,j;
@@ -17,12 +17,12 @@
 
 //     file_ptr = fopen("./example.txt", "r");
 //     assert(file_ptr != NULL);
-//     numPoints = getNumPoints(file_ptr);
-//     numCoordinates = getNumCoordinates(file_ptr);
+//     num_points = get_num_points(file_ptr);
+//     num_coordinates = get_num_coordinates(file_ptr);
 
-//     points_matrix = getMatrixFrom2DArray(points, numPoints, numCoordinates);
+//     points_matrix = getMatrixFrom2DArray(points, num_points, num_coordinates);
 
-//     printMatrix(points_matrix);
+//     print_matrix(points_matrix);
 
 //     return 0;
 // }
@@ -34,23 +34,22 @@
 /**********************/
 
 /*Recieves 2D array of doubles and its dimentions, returns Matrix with same content, including memory allocation (for Matrix pointer only - not for Matrix contents)*/
-Matrix* getMatrixFrom2DArray (double** points, int numPoints, int numCoordinates) {
+Matrix* get_matrix_from_2D_array (double** points, int num_points, int num_coordinates) {
     Matrix* output;
-    int i;
 
     /*allocate memory*/
     output = (Matrix*)malloc(sizeof(Matrix));
     assert (output != NULL); //TODO: add printf off error message
     /*initialize parameters, including n*n matrix with memory*/
-    output -> rows = numPoints;
-    output -> cols = numCoordinates;
+    output -> rows = num_points;
+    output -> cols = num_coordinates;
     output -> cells = points;
 
     return output;
 }
 
 /*Receives Matrix and prints it - 4 decimal points*/
-void printMatrix (Matrix* m) {
+void print_matrix (Matrix* m) {
     int i,j;
 
     printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
@@ -64,8 +63,7 @@ void printMatrix (Matrix* m) {
 
 
 /*Receives Matrix and prints it as is*/
-void printFullMatrix (Matrix* m) {
-    double** cells;
+void print_full_matrix (Matrix* m) {
     int i,j;
 
     printf("Matrix dimentions are: %d rows, %d columns\n", m -> rows, m -> cols);
@@ -78,18 +76,18 @@ void printFullMatrix (Matrix* m) {
 }
 
 /*Recieves integer n, allocates memory and returns n*n zeros matrix, including memory allocation*/
-Matrix* getZerosMatrixSizeN (int n) {
-    Matrix* zerosMatrix = malloc(sizeof(Matrix));
-    assert (zerosMatrix != NULL); //TODO: add printf off error message
+Matrix* get_zeros_matrix_size_n (int n) {
+    Matrix* zeros_matrix = malloc(sizeof(Matrix));
+    assert (zeros_matrix != NULL); //TODO: add printf off error message
     /*initialize parameters, including n*n matrix with memory*/
-    zerosMatrix -> rows = n;
-    zerosMatrix -> cols = n;
-    zerosMatrix -> cells = malloc(n * sizeof(double*));
+    zeros_matrix -> rows = n;
+    zeros_matrix -> cols = n;
+    zeros_matrix -> cells = malloc(n * sizeof(double*));
     for (int i=0; i < n; i++) {
-        zerosMatrix -> cells[i] = calloc(n, sizeof(double));
-        assert (zerosMatrix -> cells[i] != NULL); //TODO: add printf off error message
+        zeros_matrix -> cells[i] = calloc(n, sizeof(double));
+        assert (zeros_matrix -> cells[i] != NULL); //TODO: add printf off error message
     }
-    return zerosMatrix;
+    return zeros_matrix;
 }
 
 Matrix* get_n_k_zero_matrix (int n, int k) {
@@ -111,12 +109,12 @@ Matrix* get_n_k_zero_matrix (int n, int k) {
 }
 
 /*Recieves integer n, allocates memory and returns n*n identity matrix*/
-Matrix* getIdentitiyMatrixSizeN (int n) {
+Matrix* get_identity_matrix_size_n (int n) {
     int i;
     Matrix* identity;
 
-    /*use getZerosMatrixSizeN for memory allocation and matrix creation*/
-    identity = getZerosMatrixSizeN(n);
+    /*use get_zeros_matrix_size_n for memory allocation and matrix creation*/
+    identity = get_zeros_matrix_size_n(n);
 
     /*set diagonal to 1*/
     for (i=0; i < n; i++) {
@@ -127,33 +125,33 @@ Matrix* getIdentitiyMatrixSizeN (int n) {
 }
 
 /*Recieves symmetric matrix and returns Cell with largest absolute value (above diagonal)*/
-void getCellWithLargestValue (Matrix* m, Cell* cell_pointer) {
+void get_cell_with_largest_value (Matrix* m, Cell* cell_pointer) {
     int i,j;
-    double currAbsoluteValue;
-    Cell* largestCell;
+    double curr_absolute_value;
+    Cell* largest_cell;
     /*Initialize cell*/
-    largestCell -> row = -1;
-    largestCell -> col = -1;
-    largestCell -> value = -MAXIMUM_DOUBLE;
-    /*find largest absolute value and update largestCell accordingly*/
+    largest_cell -> row = -1;
+    largest_cell -> col = -1;
+    largest_cell -> value = -MAXIMUM_DOUBLE;
+    /*find largest absolute value and update largest_cell accordingly*/
     for (i=0; i < m -> rows; i++) {
         for (j=i+1; j < m -> cols; j++) {
-            currAbsoluteValue = fabs(m -> cells[i][j]);
-            if (currAbsoluteValue > largestCell -> value) {
-                largestCell -> row = i;
-                largestCell -> col = j;
-                largestCell -> value = currAbsoluteValue;
+            curr_absolute_value = fabs(m -> cells[i][j]);
+            if (curr_absolute_value > largest_cell -> value) {
+                largest_cell -> row = i;
+                largest_cell -> col = j;
+                largest_cell -> value = curr_absolute_value;
             }
         }
     }
 
-    cell_pointer -> row = largestCell -> row;
-    cell_pointer -> col = largestCell -> col;
-    cell_pointer -> value = largestCell -> value;
+    cell_pointer -> row = largest_cell -> row;
+    cell_pointer -> col = largest_cell -> col;
+    cell_pointer -> value = largest_cell -> value;
 }
 
 /*Recieves symmetric matrix and checks wether it's diagonal or not*/
-int isDiagonalMatrix (Matrix* m) {
+int is_diagonal_matrix (Matrix* m) {
     int i,j;
     //check if there's a non-zero element above diagonal
     for (i=0; i < m -> rows; i++) {
@@ -173,11 +171,11 @@ double sign (double num) {
 }
 
 /*Recieves two n*n symmetric matrices, returns their product and frees up memory used by those 2 matrices */
-Matrix* multiplyMatricesAndFreeMemory (Matrix* m1, Matrix* m2) {
+Matrix* multiply_matrices_and_free_memory (Matrix* m1, Matrix* m2) {
     Matrix* product;
     int i,j, k;
 
-    product = getZerosMatrixSizeN(m1 -> rows);
+    product = get_zeros_matrix_size_n(m1 -> rows);
 
     /*TODO: can we improve this multilpication without making it too complicated?*/
     /*preform regular matrix multiplication - store result in product*/
@@ -190,14 +188,14 @@ Matrix* multiplyMatricesAndFreeMemory (Matrix* m1, Matrix* m2) {
     }
 
     /*free memory of original matrices*/
-    freeMatrixMemory(m1);
-    freeMatrixMemory(m2);
+    free_matrix_memory(m1);
+    free_matrix_memory(m2);
 
     return product;
 }
 
 /*Recieves symmetric matrix and frees its memory*/
-void freeMatrixMemory (Matrix* m) {
+void free_matrix_memory (Matrix* m) {
     int n = m -> rows;
     int i;
 
@@ -211,7 +209,6 @@ void freeMatrixMemory (Matrix* m) {
 /*Recieves matrix, allocates memory and returns copy of original matrix*/
 Matrix* get_copy_of_matrix(Matrix* original) {
     Matrix* new_matrix;
-    int n;
     int i,j;
 
     new_matrix = get_n_k_zero_matrix(original -> rows, original -> cols);
@@ -256,63 +253,62 @@ Matrix* normalize_matrix (Matrix* original) {
 /**********************/
 
 /*Recieves file pointer and returns number of points == number of lines in file*/
-int getNumPoints(FILE *file_ptr) {
-    int countPoints = 1;
+int get_num_points(FILE *file_ptr) {
+    int count_points = 1;
     char ch;
     int curr_location;
 
     while ((ch = fgetc(file_ptr)) != EOF) {
         if (ch == '\n') {
-            countPoints++;
+            count_points++;
             curr_location = ftell(file_ptr);
 
         }
     }
     if (curr_location == ftell(file_ptr)) { // there is an extra \n at the end of the file
-        countPoints --;
+        count_points --;
     }
     rewind(file_ptr);
-    return countPoints;
+    return count_points;
 }
 
 /*Recieves file pointer and returns number of coordinates in each line*/
-int getNumCoordinates(FILE *file_ptr) {
-    int countCoordinates = 1;
+int get_num_coordinates(FILE *file_ptr) {
+    int count_coordinates = 1;
     char ch;
     while ((ch = fgetc(file_ptr)) != '\n') {
         if (ch == ',') {
-            countCoordinates++;
+            count_coordinates++;
         }
     }
     rewind(file_ptr);
-    return countCoordinates;
+    return count_coordinates;
 }
 
 /*Recieves number of points & coordinates along with FILE pointer and empty 2D points array, fills array with points from file*/
-void getPointsFromFile (int numPoints, int numCoordinates, FILE *file_ptr, double** points) {
-    int currentLine;
-    char singleLine[LINE_SIZE];
-    char* token;
+void get_points_from_file (int num_points, int num_coordinates, FILE *file_ptr, double** points) {
+    int current_line;
+    char single_line[LINE_SIZE];
 
-    currentLine = 0;
+    current_line = 0;
     /*verify file is non-empty - we have assumption that it's not*/
-    assert(fgets(singleLine, LINE_SIZE, file_ptr) != NULL);
+    assert(fgets(single_line, LINE_SIZE, file_ptr) != NULL);
     /*already read first line so use do-while*/
     do {
-       singleLineToPoint(points[currentLine], singleLine);
-        currentLine++;
+       single_line_to_point(points[current_line], single_line);
+        current_line++;
     }  
-    while (fgets(singleLine, LINE_SIZE, file_ptr) != NULL); 
+    while (fgets(single_line, LINE_SIZE, file_ptr) != NULL); 
 }
 
 /*Recieves pointer to single point and single line (as string), inserts coordinates (as double) to point*/
-void singleLineToPoint (double* point, char* singleLine) {
+void single_line_to_point (double* point, char* single_line) {
     char* token;
     char* pointer;
     int index;
 
     index = 0;
-    token = strtok(singleLine, ",");
+    token = strtok(single_line, ",");
     while (token != NULL) {
         point[index] = strtod(token, &pointer);
         token = strtok(NULL, ","); /*go to next token*/
@@ -325,20 +321,20 @@ Matrix* get_points_matrix (char *path) {
     Matrix * points_matrix = malloc(sizeof(Matrix));
     FILE *file_ptr;
     double** points;
-    int numPoints, numCoordinates;
+    int num_points, num_coordinates;
 
     if ((file_ptr = fopen(path, "r")) != NULL) {
-        numPoints = getNumPoints(file_ptr);
-        numCoordinates = getNumCoordinates(file_ptr);
+        num_points = get_num_points(file_ptr);
+        num_coordinates = get_num_coordinates(file_ptr);
 
         //Allocate memory for 2D-array
-        points = (double**)malloc(numPoints * sizeof(double*));
+        points = (double**)malloc(num_points * sizeof(double*));
         if (points == NULL) {
             free(points_matrix);
             return NULL;
         }
-        for (int i=0; i < numPoints; i++) {
-            points[i] = (double*)malloc(numCoordinates * sizeof(double));
+        for (int i=0; i < num_points; i++) {
+            points[i] = (double*)malloc(num_coordinates * sizeof(double));
             if (points[i] == NULL) {
                 for (int j=0; j < i; j++) {
                     free(points[i]);
@@ -350,7 +346,7 @@ Matrix* get_points_matrix (char *path) {
         }
 
     /*Fill array with parsed values from files*/
-    getPointsFromFile(numPoints , numCoordinates , file_ptr , points);
+    get_points_from_file(num_points , num_coordinates , file_ptr , points);
     } else {
         free(points_matrix);
         return NULL;
@@ -358,8 +354,8 @@ Matrix* get_points_matrix (char *path) {
 
     fclose(file_ptr);
     points_matrix->cells = points;
-    points_matrix->rows = numPoints;
-    points_matrix->cols = numCoordinates;
+    points_matrix->rows = num_points;
+    points_matrix->cols = num_coordinates;
     
     return points_matrix;
 }

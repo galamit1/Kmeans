@@ -9,9 +9,9 @@
 #define EPSILON 0.001
 
 /*** Function Declaration ***/
-static PyObject* c_kmeans(PyObject *self, PyObject *args);
+static PyObject* c_kmeans(PyObject* self, PyObject* args);
 double** init_points (int num_points, int num_coordinates);
-int python_list_of_lists_to_2D_array (PyObject *python_list_of_lists, double **target_array);
+int python_list_of_lists_to_2D_array (PyObject* python_list_of_lists, double **target_array);
 Cluster* make_cluster (const double* point, const int num_coordinates, const int index);
 Cluster** python_init_k_clusters (int k);
 void add_point_to_cluster (Cluster* cluster, const double* point, int num_coordinates);
