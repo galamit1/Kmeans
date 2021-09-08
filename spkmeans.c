@@ -149,7 +149,7 @@ Matrix* get_matrix_from_2D_array (double** points, int num_points, int num_coord
 
     /*allocate memory*/
     output = (Matrix*)malloc(sizeof(Matrix));
-    assert (output != NULL); /*TODO: add printf off error message*/
+    assert (output != NULL && "An Error Has Occured");
     /*initialize parameters, including n*n matrix with memory*/
     output -> rows = num_points;
     output -> cols = num_coordinates;
@@ -193,14 +193,14 @@ Matrix* get_zeros_matrix_size_n (int n) {
     int i;
 
     zeros_matrix = malloc(sizeof(Matrix));
-    assert (zeros_matrix != NULL); /*TODO: add printf of error message*/
+    assert (zeros_matrix != NULL && "An Error Has Occured");
     /*initialize parameters, including n*n matrix with memory*/
     zeros_matrix -> rows = n;
     zeros_matrix -> cols = n;
     zeros_matrix -> cells = malloc(n * sizeof(double*));
     for (i=0; i < n; i++) {
         zeros_matrix -> cells[i] = calloc(n, sizeof(double));
-        assert (zeros_matrix -> cells[i] != NULL); /*TODO: add printf off error message*/
+        assert (zeros_matrix -> cells[i] != NULL && "An Error Has Occured");
     }
     return zeros_matrix;
 }
@@ -210,16 +210,16 @@ Matrix* get_n_k_zero_matrix (int n, int k) {
     Matrix* nk_matrix;
     int i;
 
-    nk_matrix = malloc(sizeof(Matrix)); /*TODO: add printf off error message*/
-    assert (nk_matrix != NULL);
+    nk_matrix = malloc(sizeof(Matrix));
+    assert (nk_matrix != NULL && "An Error Has Occured");
     /*initialize parameters, including n*k matrix with memory*/
     nk_matrix -> rows = n;
     nk_matrix -> cols = k;
     nk_matrix -> cells = malloc(n * sizeof(double*));
-    assert (nk_matrix -> cells != NULL); /*TODO: add printf off error message*/
+    assert (nk_matrix -> cells != NULL && "An Error Has Occured"); 
     for (i=0; i < n; i++) {
         nk_matrix -> cells[i] = calloc(n, sizeof(double));
-        assert (nk_matrix -> cells[i] != NULL); /*TODO: add printf off error message*/
+        assert (nk_matrix -> cells[i] != NULL && "An Error Has Occured");
     }
     return nk_matrix;
 }
@@ -286,30 +286,6 @@ double sign (double num) {
     if (num >= 0)
         return 1.0;
     return -1.0;
-}
-
-/*Recieves two n*n symmetric matrices, returns their product and frees up memory used by those 2 matrices */
-Matrix* multiply_matrices_and_free_memory (Matrix* m1, Matrix* m2) {
-    Matrix* product;
-    int i,j, k;
-
-    product = get_zeros_matrix_size_n(m1 -> rows);
-
-    /*TODO: can we improve this multilpication without making it too complicated?*/
-    /*preform regular matrix multiplication - store result in product*/
-    for (i=0; i < product -> rows; i++) {
-        for (j=0; j < product -> rows; j++) {
-            for (k=0; k < product -> rows; k++) {
-                product -> cells[i][j] += (m1 -> cells[i][k])*(m2 -> cells[k][j]);
-            }
-        }
-    }
-    
-    /*free memory of original matrices*/
-    free_matrix_memory(m1);
-    free_matrix_memory(m2);
-
-    return product;
 }
 
 /*Recieves 3 n*n symmetric matrices, multiplies first 2 and stores the result in product*/
@@ -424,7 +400,7 @@ void get_points_from_file (FILE *file_ptr, double** points) {
 
     current_line = 0;
     /*verify file is non-empty - we have assumption that it's not*/
-    assert(fgets(single_line, LINE_SIZE, file_ptr) != NULL);
+    assert(fgets(single_line, LINE_SIZE, file_ptr) != NULL && "An Error Has Occured");
     /*already read first line so use do-while*/
     do {
        single_line_to_point(points[current_line], single_line);
@@ -592,7 +568,7 @@ Matrix* run_jacobi (Matrix* lnorm) {
     n = lnorm -> rows;
     /*allocate memory for eigenvalues array*/
     eigen_valus_array = (double*)malloc(n * sizeof(double));
-    assert (eigen_valus_array != NULL); /*TODO: add printf off error message*/
+    assert (eigen_valus_array != NULL && "An Error Has Occured");
     /*get eigenvectors and update eigenvalues array accordingly*/
     eigen_vectors_matrix = get_eigen_vectors_and_values(lnorm, eigen_valus_array);
     /*get initial indexes array i.e. [0,1,...,n-1] */
@@ -683,7 +659,7 @@ int* get_initial_indexes_array (int n) {
     int i;
     /*allocate memory*/
     indexes_array = (int*)malloc(n * sizeof(int));
-    assert (indexes_array != NULL); /*TODO: add printf off error message*/
+    assert (indexes_array != NULL && "An Error Has Occured");
 
     /*Insert initial indexes values to array*/
     for (i=0; i < n; i++) {
@@ -706,8 +682,7 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     Cell* largest_non_diagonal_cell;
 
     largest_non_diagonal_cell = (Cell*)malloc(sizeof(Cell));
-    assert (largest_non_diagonal_cell != NULL); /*TODO: add printf off error message*/
-
+    assert (largest_non_diagonal_cell != NULL && "An Error Has Occured");
     /*Start with input matrix as A*/
     current_A_matrix = originalMatrix;
     /*Initialize V to be identity matrix - agnostic to matrix multiplication*/
@@ -872,10 +847,10 @@ double** init_points (int num_points, int num_coordinates) {
 
     /*allocate memory for 2D array of points*/
     points = (double**)malloc(sizeof(double*) * num_points);
-    assert(points != NULL);
+    assert(points != NULL && "An Error Has Occured");
     for (i=0; i< num_points; i++) {
         points[i] = (double*)malloc(sizeof(double) * num_coordinates);
-        assert(points[i] != NULL);
+        assert(points[i] != NULL && "An Error Has Occured");
     }
 
     return points;
@@ -916,17 +891,17 @@ Cluster* make_cluster (const double* point, const int num_coordinates,const int 
 
     /*allocate memory*/
     cluster = malloc(sizeof(Cluster));
-    assert (cluster != NULL);
+    assert (cluster != NULL && "An Error Has Occured");
     /*initialize parameters*/
     cluster->cluster_size = 0;
     cluster->cluster_index = index;
     /*initialize centroids*/
     cluster->curr_centroids = (double*)malloc(sizeof(double) * num_coordinates);
-    assert (cluster->curr_centroids != NULL);
+    assert (cluster->curr_centroids != NULL && "An Error Has Occured");
     cluster->prev_centroids = (double*)malloc(sizeof(double) * num_coordinates);
-    assert (cluster->prev_centroids != NULL);
+    assert (cluster->prev_centroids != NULL && "An Error Has Occured");
     cluster->sum = (double*)malloc(sizeof(double) * num_coordinates);
-    assert (cluster->sum != NULL);
+    assert (cluster->sum != NULL && "An Error Has Occured");
 
     for (i=0; i<num_coordinates; i++) {
         cluster->curr_centroids[i] = point[i];
@@ -1073,7 +1048,7 @@ Cluster** init_k_clusters (Matrix * points, int k) {
     int i;
 
     clusters = malloc(sizeof(Cluster*) * k);
-    assert (clusters != NULL);
+    assert (clusters != NULL && "An Error Has Occured");
 
     for (i=0; i<k; i++) {
         clusters[i] = make_cluster(points->cells[i], points->cols, i);
