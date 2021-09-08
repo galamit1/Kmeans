@@ -5,7 +5,8 @@
 #ifndef SPK_KMEANS_H
 #define SPK_KMEANS_H
 
-#include "cluster.h"
+#include <Python.h>
+#include ".\cluster.h"
 #define EPSILON 0.001
 
 /*** Function Declaration ***/

@@ -1,6 +1,5 @@
-//
-// Created by galam on 26/07/2021.
-//
+#ifndef SPK_JACOBI_H
+#define SPK_JACOBI_H
 
 #include "../utils.c"
 #include <assert.h>
@@ -20,3 +19,5 @@ Matrix* get_eigen_vectors_and_values (Matrix* original_matrix, double* eigen_val
 Matrix* preform_pivot_step_and_free_memory (Matrix* A, int i, int j, double c, double s);
 double get_off_diagonal_sum_of_matrix (Matrix* m);
 Matrix* get_rotation_matrix_for_m (Matrix* m, Cell* largest_non_diagonal_cell, double c, double s);
+
+#endif //SPK_JACOBI_H
