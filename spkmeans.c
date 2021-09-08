@@ -107,6 +107,8 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
 
     /***clean all***/
     free_matrix_memory(points_matrix);
+
+    printf("finish c");
 }
 
 /**********************/
@@ -214,6 +216,7 @@ void get_cell_with_largest_value (Matrix* m, Cell* cell_pointer) {
     double curr_absolute_value;
     Cell* largest_cell;
     /*Initialize cell*/
+    largest_cell = (Cell*)malloc(sizeof(Cell));
     largest_cell -> row = -1;
     largest_cell -> col = -1;
     largest_cell -> value = -MAXIMUM_DOUBLE;
@@ -232,6 +235,7 @@ void get_cell_with_largest_value (Matrix* m, Cell* cell_pointer) {
     cell_pointer -> row = largest_cell -> row;
     cell_pointer -> col = largest_cell -> col;
     cell_pointer -> value = largest_cell -> value;
+    free(largest_cell);
 }
 
 /*Recieves symmetric matrix and checks wether it's diagonal or not*/
@@ -655,7 +659,7 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     double theta,t,c,s;
     Cell* largest_non_diagonal_cell;
 
-    largest_non_diagonal_cell = (Cell*)malloc(sizeof(Cell*));
+    largest_non_diagonal_cell = (Cell*)malloc(sizeof(Cell));
     assert (largest_non_diagonal_cell != NULL); //TODO: add printf off error message
 
     /*Start with input matrix as A*/
@@ -668,7 +672,6 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     num_iterations = 0;
 
     while ((num_iterations < NUM_ITERATIONS) && (a_previous_off - a_current_off > EPSILON)) {
-        fflush(stdout);
         /*calculte theta,t,c,s according to formula*/
         get_cell_with_largest_value(current_A_matrix, largest_non_diagonal_cell);
         i = largest_non_diagonal_cell -> row;

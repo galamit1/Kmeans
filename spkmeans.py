@@ -2,11 +2,7 @@ import sys
 
 import numpy as np
 
-import mykmeanssp
 import myspkmeans
-from python_goal_implementations.wam import wam_run
-from python_goal_implementations.ddg import ddg_run
-from python_goal_implementations.lnorm import lnorm_run
 
 POINTS_SEPARATOR = '\n'
 COORDINATES_SEPARATOR = ','
@@ -37,17 +33,19 @@ def run_spk(points, k, goal):
         probs = np.divide(distances, distances.sum())
         centroids_indexes = np.append(centroids_indexes, np.random.choice(points_num, 1, p=probs), axis=0)
         centroids = np.append(centroids, points[[centroids_indexes[-1]]], axis=0)
-    centroids_output = np.array(mykmeanssp.fit(points.tolist(), centroids.tolist(), k, goal, len(points), len(points[0])))
+    centroids_output = np.array(myspkmeans.run_spk_module(points.tolist(), centroids.tolist(), k, len(points), len(points[0])))
     centroids_output = np.round(centroids_output, decimals=4)
     print(POINTS_SEPARATOR.join([COORDINATES_SEPARATOR.join([str(c) for c in centroid]) for centroid in centroids_output.tolist()]))
 
 
 def main():
     k, goal, points = get_arguments()
+    print(goal)
     if goal == "spk" and k != 0: # I'm not sure about the k != 0
         run_spk(points, k, goal)
     else:
-        myspkmeans.fit(points, goal, len(points), len(points[0]))
+        myspkmeans.run_module(points, goal, len(points), len(points[0]))
+        print("Finished")
 
 if __name__ == '__main__':
     main()

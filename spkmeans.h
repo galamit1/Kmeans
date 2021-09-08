@@ -1,3 +1,6 @@
+#ifndef SPK_SPKMEANS_H
+#define SPK_SPKMEANS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -93,3 +96,4 @@ void free_clusters_memory (Cluster** clusters, int k);
 void free_points_memory (double** points, int num_points);
 double get_distance (Cluster* cluster, const double* point, int num_coordinates);
 
+#endif //SPK_SPKMEANS_H
