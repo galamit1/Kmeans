@@ -541,6 +541,10 @@ Matrix* run_jacobi (Matrix* lnorm) {
         get_column_by_index(final_U_matrix, eigen_vectors_matrix, i, indexes_array[i], n);
     }
 
+    free_matrix_memory(eigen_vectors_matrix);
+    free(eigen_valus_array);
+    free(indexes_array);
+
     return final_U_matrix;
 }
 
@@ -679,6 +683,8 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     for (i=0; i < current_A_matrix -> rows; i++) {
         eigen_valus_array[i] = current_A_matrix -> cells[i][i];
     }
+
+    free_matrix_memory(current_A_matrix);
 
     return v_matrix;
 }   
