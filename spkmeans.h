@@ -24,11 +24,11 @@ typedef struct cluster {
     double* sum;
 } Cluster;
 
- struct MatrixStruct {
+typedef struct Matrix {
     double** cells;
     int rows;
     int cols;
-}typedef Matrix ;
+} Matrix ;
 
 typedef struct CellStruct {
     int row;
@@ -60,7 +60,7 @@ Matrix* get_copy_of_matrix(Matrix* original);
 Matrix* normalize_matrix (Matrix* original);
 int get_num_points(FILE *fptr);
 int get_num_coordinates(FILE *fptr);
-void get_points_from_file (int num_points, int num_coordinates, FILE *fptr, double** points);
+void get_points_from_file (FILE *fptr, double** points);
 void single_line_to_point (double* point, char* single_line);
 /*** WAM ***/
 Matrix * run_wam(Matrix * points);
