@@ -30,31 +30,31 @@ static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
     /* Parse arguments from Python */
     if ((!PyArg_ParseTuple(args, "Osii", &data_points, &goal, &num_points, &num_coordinates))) {
         printf("An Error Has Occured");
-        return NULL; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
+        Py_RETURN_NONE; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
     }
 
     /*Verify that data_points & initial_indexes are python lists*/
     if (!PyList_Check(data_points)) {
         printf("An Error Has Occured");
-        return NULL;
+        Py_RETURN_NONE;
     }
 
     /*Load points from PyObject into C format of 2D-array points*/
     points = init_points(num_points, num_coordinates);
 
     if (python_list_of_lists_to_2D_array(data_points, points) != 0) {
-        return NULL;
+        Py_RETURN_NONE;
     }
     if ((points_matrix = malloc(sizeof(Matrix))) == NULL) {
         printf("An Error Has Occured");
-        return NULL;
+        Py_RETURN_NONE;
     }
 
     points_matrix->rows = num_points;
     points_matrix->cols = num_coordinates;
     points_matrix->cells = points;
     run_functions_according_to_goal(goal, points_matrix, 1);
-    return NULL;
+    Py_RETURN_NONE;
 }
 
 /*******************************/
