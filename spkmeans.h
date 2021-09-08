@@ -4,6 +4,9 @@
 #include <string.h>
 #include <math.h>
 
+#ifndef SPK_SPKMEANS_H
+#define SPK_SPKMEANS_H
+
 #define LINE_SIZE 1001 /*Given assumption each line is no more than 1000 characters + \n character*/
 #define MAXIMUM_DOUBLE 1.7E+308
 #define MAX_ITER 300
@@ -92,3 +95,4 @@ void free_clusters_memory (Cluster** clusters, int k);
 void free_points_memory (double** points, int num_points);
 double get_distance (Cluster* cluster, const double* point, int num_coordinates);
 
+#endif //SPK_SPKMEANS_H

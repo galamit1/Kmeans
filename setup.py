@@ -17,8 +17,8 @@ setup(
         #     'mykmeanssp', ['kmeans.c'],
         # ),
         Extension(
-            'myspkmeans', ['spkmeansmodule.c',],
+            'myspkmeans', [ 'spkmeans.c'],
         )
     ],
-    headers=['spkmeans.h',]
+    headers=['spkmeansmodule.h', 'spkmeans.h']
 )
