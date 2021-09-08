@@ -12,4 +12,4 @@ Cluster** python_init_k_clusters (int k);
 PyMODINIT_FUNC PyInit_myspkmeans(void);
 
 
-#endif //SPK_SPKMEANSMODULE_H
+#endif

@@ -6,7 +6,7 @@ setup(
     author='Gal and Ben',
     description='CPython API',
     install_requires=['invoke',
-                      'pandas',
+                      'numpy',
                       ],
     packages=find_packages(),
     license='GPL-2',
