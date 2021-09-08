@@ -109,6 +109,21 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
         free_matrix_memory(ddg_matrix);
         free_matrix_memory(lnorm_matrix);
     }
+    if (strcmp(goal, "jacobi") == 0) {
+        run = 1;
+        wam_matrix = run_wam(points_matrix);
+        ddg_matrix = run_ddg(wam_matrix);
+        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
+        lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
+        U_matrix = run_jacobi(lnorm_matrix);
+        T_matrix = normalize_matrix(U_matrix);
+        print_matrix(T_matrix);
+
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(ddg_matrix);
+        free_matrix_memory(U_matrix);
+        free_matrix_memory(T_matrix);
+    }
     if (strcmp(goal, "spk") == 0) {
         run = 1;
         run_spk(points_matrix, k);
