@@ -5,6 +5,7 @@
 /**********************/
 
 int main(int argc, char **argv) {
+    /*argc = number of parameters (including program name), **argv = string array of parameters.*/
     int k;
     char goal[7];
     char filePath[1000];
@@ -107,80 +108,6 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     free_matrix_memory(points_matrix);
 }
 
-
-static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
-    /*Define variables to receive from user*/
-    int k;
-    int max_iter = 300;
-    char *goal;
-    int num_points;
-    int num_coordinates;
-    PyObject *data_points;
-    double **points;
-    Matrix * points_matrix;
-
-
-    /* Parse arguments from Python */
-    if ((!PyArg_ParseTuple(args, "Osii", &data_points, &goal, &num_points, &num_coordinates))) {
-        printf("An Error Has Occured");
-        return NULL; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
-    }
-
-    /*Verify that data_points & initial_indexes are python lists*/
-    if (!PyList_Check(data_points)) {
-        printf("An Error Has Occured");
-        return NULL;
-    }
-
-    /*Load points from PyObject into C format of 2D-array points*/
-    points = init_points(num_points, num_coordinates);
-
-    if (python_list_of_lists_to_2D_array(data_points, points) != 0) {
-        return NULL;
-    }
-    if ((points_matrix = malloc(sizeof(Matrix))) == NULL) {
-        printf("An Error Has Occured");
-    }
-
-    points_matrix->rows = num_points;
-    points_matrix->cols = num_coordinates;
-    points_matrix->cells = points;
-    run_functions_according_to_goal(goal, points_matrix, k);
-    return NULL;
-}
-
-/*******************************/
-/*** Module setup ***/
-/*******************************/
-
-static PyMethodDef _methods[] = {
-        {"fit",
-                (PyCFunction) c_spkmeans,
-                     METH_VARARGS,
-                PyDoc_STR("run functions according to goal"),
-        },
-        {NULL, NULL, 0, NULL} /*Sentinel*/
-};
-
-static struct PyModuleDef _moduledef  = {
-        PyModuleDef_HEAD_INIT,
-        "myspkmeans",
-        NULL,
-        -1,
-        _methods
-};
-
-PyMODINIT_FUNC
-PyInit_myspkmeans(void)
-{
-    PyObject *m;
-    m = PyModule_Create(&_moduledef);
-    if (!m) {
-        return NULL;
-    }
-    return m;
-}
-
 /**********************/
 /**MATRIX UTILS**/
 /**********************/
@@ -229,7 +156,7 @@ void print_full_matrix (Matrix* m) {
     }
 }
 
-/*Recieves integer n, allocates memory and returns n*n zeros matrix, including memory allocation*/
+/*Recieves integer n, allocates memory and returns n*n zeros matrix*/
 Matrix* get_zeros_matrix_size_n (int n) {
     Matrix* zeros_matrix = malloc(sizeof(Matrix));
     assert (zeros_matrix != NULL); //TODO: add printf off error message
@@ -244,6 +171,7 @@ Matrix* get_zeros_matrix_size_n (int n) {
     return zeros_matrix;
 }
 
+/*Recieves integers n & k, allocates memory and returns n*k zeros matrix*/
 Matrix* get_n_k_zero_matrix (int n, int k) {
     Matrix* nk_matrix;
     int i;
@@ -514,330 +442,11 @@ Matrix* get_points_matrix (char *path) {
     return points_matrix;
 }
 
-// /*******************************/
-// /***KMEANS++ MAIN FUNCTION ***/
-// /*******************************/
-
-// static PyObject* c_kmeans(PyObject *self, PyObject *args) {
-//     /*Define variables to receive from user*/
-//     int k;
-//     int max_iter = 300;
-//     char * goal;
-//     int num_points;
-//     int num_coordinates;
-//     PyObject *data_points;
-//     PyObject *initial_centroids;
-//     double **points;
-//     double **initial_points_for_centroids;
-//     double *point;
-//     Cluster **clusters;
-//     int did_update;
-//     int i;
-//     int j;
-//     PyObject *centroids_output_list;
-//     Py_ssize_t output_list_len;
-//     PyObject *single_centroid_list;
-//     Py_ssize_t output_num_coordinates;
-//     PyObject *output_coordinate_item;
-
-
-//     /* Parse arguments from Python */
-//     if((!PyArg_ParseTuple(args, "OOisii", &data_points, &initial_centroids, &k, &goal, &num_points, &num_coordinates))) {
-//         return NULL; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
-//     }
-
-
-//     /*Verify that data_points & initial_indexes are python lists*/
-//     if (!PyList_Check(data_points) || !PyList_Check(initial_centroids)) {
-//         return NULL;
-//     }
-    
-//     /*Load points from PyObject into C format of 2D-array points*/
-//     points = init_points(num_points, num_coordinates);
-
-//     if (python_list_of_lists_to_2D_array(data_points, points) != 0) {
-//         return NULL;
-//     }
-
-//     /*Load initial centroids from PyObject into C format of 2D-array -> into clusters  */
-//     clusters = python_init_k_clusters(k);
-//     initial_points_for_centroids = init_points(k, num_coordinates);
-
-//     if (python_list_of_lists_to_2D_array(initial_centroids, initial_points_for_centroids) != 0) {
-//         return NULL;
-//     }
-
-//     for (i=0; i<k; i++) {
-//         clusters[i] = make_cluster(initial_points_for_centroids[i], num_coordinates, i);
-//     }
-
-//     free_points_memory(initial_points_for_centroids, k); /*we don't need this 2D array anymore since initial centroids are now stored in clusters*/
-
-//     /***Execute k-means algorithm***/
-//     did_update = 0;
-
-//     for (i=0; i<max_iter; i++) {
-//         for (j=0; j<num_points; j++) {
-//             point = points[j];
-//             find_minimum_distance(clusters, point, k, num_coordinates);
-//         }
-//         did_update = update_all_clusters(clusters, k, num_coordinates);
-//         if (did_update == 1) { /*No update occured - we can break*/
-//             break;
-//         }
-//     }
-
-//     free_points_memory(points, num_points);
-
-//     /***Convert results to Python Object***/
-//     output_list_len = k;
-//     output_num_coordinates = num_coordinates;
-//     centroids_output_list = PyList_New(output_list_len); /*Create final centroids list*/
-//     if (centroids_output_list == NULL) {
-//         return NULL;
-//     }
-//     for (i=0; i<k; i++) {
-//         single_centroid_list = PyList_New(output_num_coordinates); /*Create single centroid list*/
-//         if (single_centroid_list == NULL) {
-//             return NULL;
-//         }
-//         for (j=0; j<num_coordinates; j++) {
-//             output_coordinate_item = PyFloat_FromDouble(clusters[i]->curr_centroids[j]);
-//             if (output_coordinate_item == NULL) {
-//                 return NULL;
-//             }
-//             PyList_SET_ITEM(single_centroid_list, j, output_coordinate_item); /*user macro version of PyList_setItem() since there's no previous content*/
-//         }
-//         PyList_SET_ITEM(centroids_output_list, i, single_centroid_list);
-//     }
-
-//     free_clusters_memory(clusters, k);
-
-//     return centroids_output_list;
-// }
-
-/*******************************/
-/*** KMEANS++ FUNCTIONS ***/
-/*******************************/
-
-double** init_points (int num_points, int num_coordinates) {
-     /*
-    Recieves number of points and number of coordinates,
-    Returns new 2D array of points with sufficient memory to store all points.
-    */
-    double** points;
-    int i;
-
-    /*allocate memory for 2D array of points*/
-    points = (double**)malloc(sizeof(double*) * num_points);
-    assert(points != NULL);
-    for (i=0; i< num_points; i++) {
-        points[i] = (double*)malloc(sizeof(double) * num_coordinates);
-        assert(points[i] != NULL);
-    }
-
-    return points;
-}
-
-int python_list_of_lists_to_2D_array (PyObject *python_list_of_lists, double **target_array) {
-    Py_ssize_t list_size;
-    Py_ssize_t entry_size;
-    PyObject *point_item;
-    PyObject *coordinate_item;
-    int i;
-    int j;
-
-    list_size = PyList_Size(python_list_of_lists); /*equivilant to len(_list) in Python*/
-    for (i=0; i<list_size; i++) { /*iterate over points*/
-        point_item = PyList_GetItem(python_list_of_lists, i);
-        if (!PyList_Check(point_item)) {
-            return 1;
-        }
-        entry_size = PyList_Size(point_item);
-        for (j=0; j<entry_size; j++) { /*iterate over coordinates of single point*/
-            coordinate_item = PyList_GetItem(point_item, j);
-            if (!PyFloat_Check(coordinate_item)) {
-                return 1;
-            }
-            target_array[i][j] = PyFloat_AsDouble(coordinate_item);
-        }
-    }
-    return 0;
-}
-
-Cluster* make_cluster (const double* point, const int num_coordinates,const int index) {
-    /*
-    Recieves a point, number of coordinates and a specific cluster index,
-    Returns new Cluster with sufficient memory space to store both the current centroid and the previous centroid, holding the current centroid which is the input point.
-    */
-    int i;
-    Cluster* cluster;
-
-    /*allocate memory*/
-    cluster = malloc(sizeof(Cluster));
-    assert (cluster != NULL);
-    /*initialize parameters*/
-    cluster->cluster_size = 0;
-    cluster->cluster_index = index;
-    /*initialize centroids*/
-    cluster->curr_centroids = (double*)malloc(sizeof(double) * num_coordinates);
-    assert (cluster->curr_centroids != NULL);
-    cluster->prev_centroids = (double*)malloc(sizeof(double) * num_coordinates);
-    assert (cluster->prev_centroids != NULL);
-    cluster->sum = (double*)malloc(sizeof(double) * num_coordinates);
-    assert (cluster->sum != NULL);
-
-    for (i=0; i<num_coordinates; i++) {
-        cluster->curr_centroids[i] = point[i];
-        cluster->sum [i] = 0;
-    }
-
-    return cluster;
-}
-
-Cluster** python_init_k_clusters (int k) {
-    /*
-    Recieves pointer to 2D array of points, k, number of coordinates and 2D array of initial indexes,
-    Returns new 2D array of Clusters with sufficient memory, initialized with the first k points.
-    */
-    Cluster **clusters;
-
-    clusters = malloc(sizeof(Cluster*) * k);
-    assert (clusters != NULL);
-
-    return clusters;
-}
-
-void add_point_to_cluster (Cluster* cluster,const double* point, int num_coordinates) {
-    /*
-    Recieves pointer to a Cluster, a point and number of coordinates,
-    Adds the given point to the given cluster.
-    */
-    int i;
-
-    cluster->cluster_size += 1;
-    for (i=0; i<num_coordinates; i++) {
-        cluster->sum[i] += point[i];
-    }
-}
-
-void find_minimum_distance (Cluster** clusters, double* point, int k, int num_coordinates) {
-    /*
-    Recieves 2D Clsuter array, pointer to a point, k and number of coordinates,
-    Checks which centroid is closest to the given point,
-    Adds point to closest cluster.
-    */
-    int i;
-    int index_min;
-    double distance_min;
-    double current_distance;
-
-    /*initialize distance_min to largest double value ~ INF*/
-    distance_min = 1.7976931348623155e+308;
-    index_min = -1;
-
-    for (i=0; i<k; i++) {
-        current_distance = get_distance(clusters[i], point, num_coordinates);
-        if (current_distance < distance_min) {
-            distance_min = current_distance;
-            index_min = clusters[i]->cluster_index;
-        }
-    }
-
-    add_point_to_cluster(clusters[index_min], point, num_coordinates);
-}
-
-
-double update_cluster_centroids_and_sum (Cluster* cluster, int num_coordinates) {
-    /*
-    Recieves pointer to a changed cluster and number of coordinates,
-    Updates cluster accordingly,
-    Returns the distance between previous centroid and current centroid.
-    */
-    int i;
-    double distance;
-
-    for (i=0; i<num_coordinates; i++) {
-        cluster->prev_centroids[i] = cluster->curr_centroids[i];
-        cluster->curr_centroids[i] = cluster->sum[i] / cluster->cluster_size;
-        cluster->sum[i] = 0;
-    }
-
-    cluster->cluster_size = 0;
-    distance = get_distance(cluster, cluster->prev_centroids, num_coordinates);
-    return distance;
-}
-
-int update_all_clusters (Cluster** clusters, int k, int num_coordinates) {
-    /*
-    Recieves 2D array of clusters, k and number of coordinates,
-    Upadates all clusters using update_cluster_centroids_and_sum while counting total change in distance,
-    Returns 1 if no update was made, 0 otherwise.
-    */
-    int i;
-    double total_update;
-
-    total_update = 0.0;
-
-    for (i=0; i<k; i++) {
-        total_update += update_cluster_centroids_and_sum (clusters[i], num_coordinates);
-    }
-
-    if (total_update < KMEANS_EPSILON) {
-        /*no update was made*/
-        return 1;
-    }
-    return 0;
-}
-
-void free_clusters_memory (Cluster** clusters, int k) {
-    /*
-    Recieves 2D array of clusters and k,
-    Frees up memory used by all clusters.
-    */
-    int i;
-    Cluster* curr_cluster;
-
-    for (i=0; i<k; i++) {
-        curr_cluster = clusters[i];
-        if (curr_cluster != NULL) {
-            free(curr_cluster->curr_centroids);
-            free(curr_cluster->prev_centroids);
-            free(curr_cluster->sum);
-            free(curr_cluster);
-        }
-    }
-}
-
-void free_points_memory (double** points, int num_points) {
-    /*Recieves 2D array of pounts and number of points, Frees up memory used by all points.*/
-    int i;
-
-    for (i=0; i<num_points; i++) {
-        free(points[i]);
-    }
-}
-
-double get_distance (Cluster* cluster, const double* point, int num_coordinates) {
-    /*
-    Recieves pointer to cluster, pointer to point and number of coordinates,
-    Returns euclidean distance of point from cluster.
-    */
-    double distance;
-    double toAdd;
-    int i;
-
-    distance = 0;
-    for (i=0; i<num_coordinates; i++) {
-        toAdd = (cluster->curr_centroids[i] - point[i]);
-        distance += (toAdd*toAdd);
-    }
-    return distance;
-}
-
 /*******************************/
 /*** WAM FUNCTIONS ***/
 /*******************************/
+
+/*Recieves matrix, allocates memory and creates its W matrix*/
 Matrix * run_wam(Matrix * points) {
     Matrix * wam_matrix = get_zeros_matrix_size_n(points->rows);
     double weight;
@@ -851,6 +460,7 @@ Matrix * run_wam(Matrix * points) {
     return wam_matrix;
 }
 
+/*Recieves 2 datapoints and num_coordinates, reterns the weight between both points*/
 double calculate_weight(double * point1, double * point2, int num_coordinates) {
     double weight = 0;
     for (int i = 0; i < num_coordinates; i++) {
@@ -862,6 +472,7 @@ double calculate_weight(double * point1, double * point2, int num_coordinates) {
 /*******************************/
 /*** DDG FUNCTIONS ***/
 /*******************************/
+/*Receives W matrix, allocates memory and creates its D matrix*/
 Matrix * run_ddg(Matrix * wam) {
     Matrix * ddg_matrix = get_zeros_matrix_size_n(wam->rows);
     double row_sum;
@@ -875,6 +486,7 @@ Matrix * run_ddg(Matrix * wam) {
     return ddg_matrix;
 }
 
+/*Receives D matrix and converts it in-place to D^-1/2*/
 void convert_ddg_with_the_pow_of_minus_half(Matrix * ddg_matrix) {
     for (int i=0; i < ddg_matrix->rows; i++) {
         ddg_matrix->cells[i][i] = pow(ddg_matrix->cells[i][i], -0.5);
@@ -884,6 +496,7 @@ void convert_ddg_with_the_pow_of_minus_half(Matrix * ddg_matrix) {
 /*******************************/
 /*** LNORM FUNCTIONS ***/
 /*******************************/
+/*Receives W & D matrixes, computes and returns their lnorm*/
 Matrix * run_lnorm(Matrix * wam, Matrix * ddg) {
     Matrix * lnorm = get_identity_matrix_size_n(wam->rows);
     double value;
@@ -974,7 +587,7 @@ void swap_doubles(double *xp, double *yp) {
     *xp = *yp;
     *yp = temp;
 }
-
+/*Recieve 2 int pointers and swap them*/
 void swap_ints(int *xp, int *yp) {
     int temp = *xp;
     *xp = *yp;
@@ -1034,7 +647,8 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     num_iterations = 0;
 
     while ((num_iterations < NUM_ITERATIONS) && (a_previous_off - a_current_off > EPSILON)) {
-        printf("\n\nIteration number %d: \n", num_iterations+1);
+            /*TODO: remove!*/
+        printf("\n\nIteration number %d: \n", num_iterations);
         /*calculte theta,t,c,s according to formula*/
         get_cell_with_largest_value(current_A_matrix, largest_non_diagonal_cell);
         i = largest_non_diagonal_cell -> row;
@@ -1047,13 +661,8 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
         /*Get P matrix according to c & s*/
         current_P_matrix = get_rotation_matrix_for_m(current_A_matrix, largest_non_diagonal_cell, c, s);
 
-        // printf("\nP matrix is: \n");
-        // print_matrix(current_P_matrix);
-
         /*Update V according to current P*/
         v_matrix = multiply_matrices_and_free_memory(v_matrix, current_P_matrix);
-        printf("Current V matrix is: \n");
-        print_matrix(v_matrix);
         
         /*Preform pivot step from A to A' and update Off values*/
         current_A_matrix = preform_pivot_step_and_free_memory(current_A_matrix, i, j, c, s);
@@ -1063,9 +672,6 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
 
         num_iterations++;
     }
-
-    printf("\n\nFinal A matrix is:\n");
-    print_matrix(current_A_matrix);
 
     free(largest_non_diagonal_cell); /*Largest cell data is un-needed from this point, so free the memory space allocated by get_cell_with_largest_value*/
 
@@ -1144,11 +750,10 @@ Matrix* get_rotation_matrix_for_m (Matrix* m, Cell* largest_non_diagonal_cell, d
 }
 
 /*******************************/
-/*** LNORM FUNCTIONS ***/
+/*** SPK FUNCTIONS ***/
 /*******************************/
+/*Receives matrix and k value, preforms spectral clustering accordingly and prints the result*/
 void run_spk(Matrix * points, int k) {
-    /*argc = number of parameters (including program name), **argv = string array of parameters.*/
-
     /***Variables declarations***/
     double *point;
     Cluster **clusters;
@@ -1179,6 +784,211 @@ void run_spk(Matrix * points, int k) {
         printf("\n");
     }
     free_clusters_memory(clusters, k);
+}
+
+double** init_points (int num_points, int num_coordinates) {
+     /*
+    Recieves number of points and number of coordinates,
+    Returns new 2D array of points with sufficient memory to store all points.
+    */
+    double** points;
+    int i;
+
+    /*allocate memory for 2D array of points*/
+    points = (double**)malloc(sizeof(double*) * num_points);
+    assert(points != NULL);
+    for (i=0; i< num_points; i++) {
+        points[i] = (double*)malloc(sizeof(double) * num_coordinates);
+        assert(points[i] != NULL);
+    }
+
+    return points;
+}
+
+
+double* convert_line_to_point (double* point, char* line) {
+     /*
+    Recieves pointer to char array containing a line (=point) and pointer to initialized double-array (=point),
+    Returns the same point after filling it with double values from the line, using string.h functio strtok.
+    Reference: https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
+    */
+    char* tokens;
+    int index;
+
+    index = 0;
+
+    tokens = strtok(line, ",");
+
+    while (tokens != NULL) {
+        point[index] = atof(tokens);
+        tokens = strtok(NULL, ",");
+        index++;
+    }
+
+    return point;
+}
+
+
+
+Cluster* make_cluster (const double* point, const int num_coordinates,const int index) {
+    /*
+    Recieves a point, number of coordinates and a specific cluster index,
+    Returns new Cluster with sufficient memory space to store both the current centroid and the previous centroid.
+    */
+    int i;
+    Cluster* cluster;
+
+    /*allocate memory*/
+    cluster = malloc(sizeof(Cluster));
+    assert (cluster != NULL);
+    /*initialize parameters*/
+    cluster->cluster_size = 0;
+    cluster->cluster_index = index;
+    /*initialize centroids*/
+    cluster->curr_centroids = (double*)malloc(sizeof(double) * num_coordinates);
+    assert (cluster->curr_centroids != NULL);
+    cluster->prev_centroids = (double*)malloc(sizeof(double) * num_coordinates);
+    assert (cluster->prev_centroids != NULL);
+    cluster->sum = (double*)malloc(sizeof(double) * num_coordinates);
+    assert (cluster->sum != NULL);
+
+    for (i=0; i<num_coordinates; i++) {
+        cluster->curr_centroids[i] = point[i];
+        cluster->sum [i] = 0;
+    }
+
+    return cluster;
+}
+
+void add_point_to_cluster (Cluster* cluster,const double* point, int num_coordinates) {
+    /*
+    Recieves pointer to a Cluster, a point and number of coordinates,
+    Adds the given point to the given cluster.
+    */
+    int i;
+
+    cluster->cluster_size += 1;
+    for (i=0; i<num_coordinates; i++) {
+        cluster->sum[i] += point[i];
+    }
+}
+
+void find_minimum_distance (Cluster** clusters, double* point, int k, int num_coordinates) {
+    /*
+    Recieves 2D Clsuter array, pointer to a point, k and number of coordinates,
+    Checks which centroid is closest to the given point,
+    Adds point to closest cluster.
+    */
+    int i;
+    int index_min;
+    double distance_min;
+    double current_distance;
+
+    /*initialize distance_min to largest double value ~ INF*/
+    distance_min = 1.7976931348623155e+308;
+    index_min = -1;
+
+    for (i=0; i<k; i++) {
+        current_distance = get_distance(clusters[i], point, num_coordinates);
+        if (current_distance < distance_min) {
+            distance_min = current_distance;
+            index_min = clusters[i]->cluster_index;
+        }
+    }
+
+    add_point_to_cluster(clusters[index_min], point, num_coordinates);
+}
+
+
+double update_cluster_centroids_and_sum (Cluster* cluster, int num_coordinates) {
+    /*
+    Recieves pointer to a changed cluster and number of coordinates,
+    Updates cluster accordingly,
+    Returns the distance between previous centroid and current centroid.
+    */
+    int i;
+    double distance;
+
+    for (i=0; i<num_coordinates; i++) {
+        cluster->prev_centroids[i] = cluster->curr_centroids[i];
+        cluster->curr_centroids[i] = cluster->sum[i] / cluster->cluster_size;
+        cluster->sum[i] = 0;
+    }
+
+    cluster->cluster_size = 0;
+    distance = get_distance(cluster, cluster->prev_centroids, num_coordinates);
+    return distance;
+}
+
+int update_all_clusters (Cluster** clusters, int k, int num_coordinates) {
+    /*
+    Recieves 2D array of clusters, k and number of coordinates,
+    Upadates all clusters using update_cluster_centroids_and_sum while counting total change in distance,
+    Returns 1 if no update was made, 0 otherwise.
+    */
+    int i;
+    double total_update;
+
+    total_update = 0.0;
+
+    for (i=0; i<k; i++) {
+        total_update += update_cluster_centroids_and_sum (clusters[i], num_coordinates);
+    }
+
+    if (total_update < EPSILON) {
+        /*no update was made*/
+        return 1;
+    }
+    return 0;
+}
+
+void free_clusters_memory (Cluster** clusters, int k) {
+    /*
+    Recieves 2D array of clusters and k,
+    Frees up memory used by all clusters.
+    */
+    int i;
+    Cluster* curr_cluster;
+
+    for (i=0; i<k; i++) {
+        curr_cluster = clusters[i];
+        if (curr_cluster != NULL) {
+            free(curr_cluster->curr_centroids);
+            free(curr_cluster->prev_centroids);
+            free(curr_cluster->sum);
+            free(curr_cluster);
+        }
+    }
+}
+
+void free_points_memory (double** points, int num_points) {
+    /*
+    Recieves 2D array of pounts and number of points,
+    Frees up memory used by all points.
+    */
+    int i;
+
+    for (i=0; i<num_points; i++) {
+        free(points[i]);
+    }
+}
+
+
+double get_distance (Cluster* cluster, const double* point, int num_coordinates) {
+    /*
+    Recieves pointer to cluster, pointer to point and number of coordinates,
+    Returns euclidean distance of point from cluster.
+    */
+    double distance;
+    double toAdd;
+    int i;
+
+    distance = 0;
+    for (i=0; i<num_coordinates; i++) {
+        toAdd = (cluster->curr_centroids[i] - point[i]);
+        distance += (toAdd*toAdd);
+    }
+    return distance;
 }
 
 /*Recieves pointer to 2D array of points, k and number of coordinates,Returns new 2D array of Clusters with sufficient memory, initialized with the first k points.*/
