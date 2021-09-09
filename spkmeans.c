@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
         lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
         free_matrix_memory(wam_matrix);
         free_matrix_memory(ddg_matrix);
-        U_matrix = run_jacobi(lnorm_matrix);
+        U_matrix = run_jacobi(lnorm_matrix, goal);
         T_matrix = normalize_matrix(U_matrix);
 
         if (strcmp(goal, "spk") == 0) {
@@ -51,10 +51,9 @@ int main(int argc, char **argv) {
             run_spk(T_matrix, k);
         }
         if (strcmp(goal, "jacobi") == 0) {
-            print_matrix(T_matrix);
+            
         }
 
-        
         free_matrix_memory(lnorm_matrix);
         free_matrix_memory(U_matrix);
         free_matrix_memory(T_matrix);
@@ -114,10 +113,8 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
         ddg_matrix = run_ddg(wam_matrix);
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        U_matrix = run_jacobi(lnorm_matrix);
+        U_matrix = run_jacobi(lnorm_matrix, goal);
         T_matrix = normalize_matrix(U_matrix);
-        print_matrix(T_matrix);
-
         free_matrix_memory(wam_matrix);
         free_matrix_memory(ddg_matrix);
         free_matrix_memory(U_matrix);
@@ -159,6 +156,27 @@ void print_matrix (Matrix* m) {
     int i,j;
     for (i=0; i < m -> rows; i++) {
         for (j=0; j < m -> cols - 1; j++) {
+            if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) {
+                printf("%.4f,", m->cells[i][j] * (-1));
+            }
+            else {
+                printf("%.4f,", m -> cells[i][j]);
+            }
+         }
+         if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) {
+             printf("%.4f\n", m -> cells[i][j] * (-1));
+         }
+         else {
+             printf("%.4f\n", m -> cells[i][j]);
+         }
+     }
+}
+
+/*Receives Matrix and prints its transpose - 4 decimal points*/
+void print_matrix_transpose(Matrix* m) {
+    int i,j;
+    for (j=0; j < m -> cols; j++) {
+        for (i=0; i < m -> rows - 1; i++) {
             if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) {
                 printf("%.4f,", m->cells[i][j] * (-1));
             }
@@ -557,7 +575,7 @@ Matrix * run_lnorm(Matrix * wam, Matrix * ddg) {
 /*** JACOBI FUNCTIONS ***/
 /*******************************/
 /*Recieves lnorm symmetric matrix, runs jacobi algorithm and returns n*k matrix U  containing the first k eigenvectors u1, . . . , uk of Lnorm columns. K is inferred by matrix size*/
-Matrix* run_jacobi (Matrix* lnorm) {
+Matrix* run_jacobi (Matrix* lnorm, char* goal) {
     Matrix* eigen_vectors_matrix;
     Matrix* final_U_matrix;
     double* eigen_valus_array;
@@ -572,6 +590,15 @@ Matrix* run_jacobi (Matrix* lnorm) {
     assert (eigen_valus_array != NULL && "An Error Has Occured");
     /*get eigenvectors and update eigenvalues array accordingly*/
     eigen_vectors_matrix = get_eigen_vectors_and_values(lnorm, eigen_valus_array);
+    if (strcmp(goal, "jacobi") == 0) {
+        /*print eigenvalues*/
+        for (i=0; i < n-1; i++) {
+            printf("%.4f,", eigen_valus_array[i]);
+        }
+        printf("%.4f\n", eigen_valus_array[n-1]);
+        /*If goal=jacobi: print eigenvectors*/
+        print_matrix_transpose(eigen_vectors_matrix);
+    }
     /*get initial indexes array i.e. [0,1,...,n-1] */
     indexes_array = get_initial_indexes_array(n);
     /*get eigengap k and preserve original indexes during sort*/

@@ -46,6 +46,7 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
 Matrix* get_points_matrix (char *path);
 Matrix* get_matrix_from_2D_array (double** points, int num_points, int num_coordinates);
 void print_matrix (Matrix* m);
+void print_matrix_transpose(Matrix* m);
 void print_full_matrix (Matrix* m);
 Matrix* get_zeros_matrix_size_n (int n);
 Matrix* get_n_k_zero_matrix (int n, int k);
@@ -70,7 +71,7 @@ void convert_ddg_with_the_pow_of_minus_half(Matrix * ddg_matrix);
 /*** LNORM ***/
 Matrix * run_lnorm(Matrix * wam, Matrix * ddg);
 /*** JACOBI ***/
-Matrix* run_jacobi (Matrix* lnorm);
+Matrix* run_jacobi (Matrix* lnorm, char* goal);
 void get_column_by_index(Matrix* m1, Matrix* m2, int m1_index, int m2_index, int column_size);
 int get_eigen_gap_k (double* eigen_valus_array, int* indexes_array, int array_length);
 void swap_doubles(double *xp, double *yp);
