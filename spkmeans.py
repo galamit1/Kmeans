@@ -41,8 +41,9 @@ def run_spk(points, k, goal):
 
 def main():
     k, goal, points = get_arguments()
-    if goal == "spk" and k != 0: # I'm not sure about the k != 0
-        run_spk(points, k, goal)
+    if goal == "spk":
+        t_matrix = myspkmeans.get_points_for_spk(points, k, len(points), len(points[0]))
+        run_spk(t_matrix, len(t_matrix[0]), goal)
     else:
         myspkmeans.run_module(points, goal, len(points), len(points[0]))
 

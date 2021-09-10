@@ -158,6 +158,90 @@ static PyObject* c_spk(PyObject *self, PyObject *args) {
     return centroids_output_list;
 }
 
+static PyObject* c_get_t_matrix(PyObject *self, PyObject *args) {
+    /*Define variables to receive from user*/
+    int k;
+    int num_points;
+    int num_coordinates;
+    PyObject *data_points;
+    double **points;
+    double *point;
+    int i;
+    int j;
+    Py_ssize_t output_list_len;
+    Py_ssize_t output_num_coordinates;
+    PyObject *output_list;
+    PyObject *single_line;
+    PyObject *output_coordinate_item;
+    Matrix* points_matrix;
+    Matrix* wam_matrix;
+    Matrix* ddg_matrix;
+    Matrix* lnorm_matrix;
+    Matrix* U_matrix;
+    Matrix* T_matrix;
+
+
+    /* Parse arguments from Python */
+    if((!PyArg_ParseTuple(args, "Oiii", &data_points, &k, &num_points, &num_coordinates))) {
+        return NULL; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
+    }
+
+
+    /*Verify that data_points & initial_indexes are python lists*/
+    if (!PyList_Check(data_points)) {
+        return NULL;
+    }
+
+    /*Load points from PyObject into C format of 2D-array points*/
+    points = init_points(num_points, num_coordinates);
+
+    if (python_list_of_lists_to_2D_array(data_points, points) != 0) {
+        return NULL;
+    }
+
+    /* create point matrix */
+    points_matrix = get_matrix_from_2D_array(points, num_points, num_coordinates);
+
+    /* run flow to get the T matrix */
+    wam_matrix = run_wam(points_matrix);
+    ddg_matrix = run_ddg(wam_matrix);
+    convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
+    lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
+    U_matrix = run_jacobi(lnorm_matrix, "spk");
+    T_matrix = normalize_matrix(U_matrix);
+
+    free_matrix_memory(wam_matrix);
+    free_matrix_memory(ddg_matrix);
+    free_matrix_memory(lnorm_matrix);
+    free_matrix_memory(U_matrix);
+
+
+    /***Convert results to Python Object***/
+    output_list_len = T_matrix->rows;
+    output_num_coordinates = T_matrix->cols;
+    output_list = PyList_New(output_list_len); /*Create final centroids list*/
+    if (output_list == NULL) {
+        return NULL;
+    }
+    for (i=0; i<T_matrix->rows; i++) {
+        single_line = PyList_New(output_num_coordinates); /*Create single line*/
+        if (single_line == NULL) {
+            return NULL;
+        }
+        for (j=0; j<T_matrix->cols; j++) {
+            output_coordinate_item = PyFloat_FromDouble(T_matrix->cells[i][j]);
+            if (output_coordinate_item == NULL) {
+                return NULL;
+            }
+            PyList_SET_ITEM(single_line, j, output_coordinate_item); /*user macro version of PyList_setItem() since there's no previous content*/
+        }
+        PyList_SET_ITEM(output_list, i, single_line);
+    }
+
+    free_matrix_memory(T_matrix);
+    return output_list;
+}
+
 /*******************************/
 /*** Modules setup ***/
 /*******************************/
@@ -172,6 +256,11 @@ static PyMethodDef _methods[] = {
                 (PyCFunction) c_spk,
                 METH_VARARGS,
                 PyDoc_STR("Kmeans execution with given initial centroids."),
+        },
+        {"get_points_for_spk",
+            (PyCFunction) c_get_t_matrix,
+            METH_VARARGS,
+            PyDoc_STR("return the calculated T matrix."),
         },
         {NULL, NULL, 0, NULL} /*Sentinel*/
 };
