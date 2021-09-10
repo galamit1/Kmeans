@@ -1055,13 +1055,13 @@ double get_distance (Cluster* cluster, const double* point, int num_coordinates)
     Returns euclidean distance of point from cluster.
     */
     double distance;
-    double toAdd;
+    double to_add;
     int i;
 
     distance = 0;
     for (i=0; i<num_coordinates; i++) {
-        toAdd = (cluster->curr_centroids[i] - point[i]);
-        distance += (toAdd*toAdd);
+        to_add = (cluster->curr_centroids[i] - point[i]);
+        distance += (to_add * to_add);
     }
     return distance;
 }
