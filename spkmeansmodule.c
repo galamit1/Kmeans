@@ -186,7 +186,6 @@ static PyObject* c_get_t_matrix(PyObject *self, PyObject *args) {
         return NULL; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
     }
 
-
     /*Verify that data_points & initial_indexes are python lists*/
     if (!PyList_Check(data_points)) {
         return NULL;
@@ -219,7 +218,7 @@ static PyObject* c_get_t_matrix(PyObject *self, PyObject *args) {
     /***Convert results to Python Object***/
     output_list_len = T_matrix->rows;
     output_num_coordinates = T_matrix->cols;
-    output_list = PyList_New(output_list_len); /*Create final centroids list*/
+    output_list = PyList_New(output_list_len); /*Create final points list as python object*/
     if (output_list == NULL) {
         return NULL;
     }
@@ -239,6 +238,7 @@ static PyObject* c_get_t_matrix(PyObject *self, PyObject *args) {
     }
 
     free_matrix_memory(T_matrix);
+    
     return output_list;
 }
 

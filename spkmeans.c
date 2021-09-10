@@ -107,7 +107,7 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     if (run == 0) {
         printf("Invalid input");
     }
-    
+
     free_matrix_memory(points_matrix);
 }
 
@@ -305,11 +305,17 @@ void free_matrix_memory (Matrix* m) {
     int n = m -> rows;
     int i;
 
-    for (i=0; i < n; i++) {
-            free(m -> cells[i]);
+    if (m != NULL) {
+        if (m->cells != NULL) {
+            for (i=0; i < n; i++) {
+                if (m-> cells[i] != NULL) {
+                    free(m -> cells[i]);
+                }
+            }
+            free(m -> cells);
+        }
+        free(m);
     }
-    free(m -> cells);
-    free(m);
 }
 
 /*Recieves matrix, allocates memory and returns copy of original matrix*/
@@ -558,6 +564,7 @@ Matrix * run_lnorm(Matrix * wam, Matrix * ddg) {
 Matrix* run_jacobi (Matrix* lnorm, char* goal) {
     Matrix* eigen_vectors_matrix;
     Matrix* final_U_matrix;
+    Matrix* lnorm_copy;
     double* eigen_values_array;
     int* indexes_array;
     int n;
@@ -569,7 +576,8 @@ Matrix* run_jacobi (Matrix* lnorm, char* goal) {
     eigen_values_array = (double*)malloc(n * sizeof(double));
     assert (eigen_values_array != NULL && "An Error Has Occured");
     /*get eigenvectors and update eigenvalues array accordingly*/
-    eigen_vectors_matrix = get_eigen_vectors_and_values(lnorm, eigen_values_array);
+    lnorm_copy = get_copy_of_matrix(lnorm); /*work with deep copy of lnorm to avoid freeing issues*/
+    eigen_vectors_matrix = get_eigen_vectors_and_values(lnorm_copy, eigen_values_array);
     if (strcmp(goal, "jacobi") == 0) {
         /*print eigenvalues*/
         for (i=0; i < n-1; i++) {
