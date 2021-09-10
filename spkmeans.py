@@ -33,6 +33,7 @@ def run_spk(points, k, goal):
         probs = np.divide(distances, distances.sum())
         centroids_indexes = np.append(centroids_indexes, np.random.choice(points_num, 1, p=probs), axis=0)
         centroids = np.append(centroids, points[[centroids_indexes[-1]]], axis=0)
+    print(COORDINATES_SEPARATOR.join([str(c) for c in centroids_indexes]))
     centroids_output = np.array(myspkmeans.run_spk_module(points.tolist(), centroids.tolist(), k, len(points), len(points[0])))
     centroids_output = np.round(centroids_output, decimals=4)
     print(POINTS_SEPARATOR.join([COORDINATES_SEPARATOR.join([str(c) for c in centroid]) for centroid in centroids_output.tolist()]))
