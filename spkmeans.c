@@ -46,14 +46,9 @@ int main(int argc, char **argv) {
         U_matrix = run_jacobi(lnorm_matrix, goal);
         T_matrix = normalize_matrix(U_matrix);
 
-        if (strcmp(goal, "spk") == 0) {
-            k = T_matrix->cols;
-            run_spk(T_matrix, k);
-        }
-        if (strcmp(goal, "jacobi") == 0) {
-            
-        }
-
+        k = T_matrix->cols;
+        run_spk(T_matrix, k);
+        
         free_matrix_memory(lnorm_matrix);
         free_matrix_memory(U_matrix);
         free_matrix_memory(T_matrix);
