@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if ((k == 0) && (strcmp(goal, "spk")))
+    if ((k == 0) && (strcmp(goal, "spk") == 0))
     {
         Matrix* wam_matrix;
         Matrix* ddg_matrix;
@@ -53,6 +53,7 @@ int main(int argc, char **argv) {
         free_matrix_memory(U_matrix);
         free_matrix_memory(T_matrix);
         free_matrix_memory(points_matrix);
+        return 0;
     }
 
     if (k >= points_matrix->rows) { /*so that k < number of points*/
@@ -116,7 +117,6 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     if (run == 0) {
         printf("Invalid input");
     }
-
     free_matrix_memory(points_matrix);
 }
 
@@ -216,7 +216,7 @@ Matrix* get_n_k_zero_matrix (int n, int k) {
     Matrix* nk_matrix;
     int i;
 
-    nk_matrix = malloc(sizeof(Matrix));
+    nk_matrix = (Matrix*)malloc(sizeof(Matrix));
     assert (nk_matrix != NULL && "An Error Has Occured");
     /*initialize parameters, including n*k matrix with memory*/
     nk_matrix -> rows = n;
@@ -567,35 +567,31 @@ Matrix * run_lnorm(Matrix * wam, Matrix * ddg) {
 Matrix* run_jacobi (Matrix* lnorm, char* goal) {
     Matrix* eigen_vectors_matrix;
     Matrix* final_U_matrix;
-    double* eigen_valus_array;
+    double* eigen_values_array;
     int* indexes_array;
     int n;
     int k;
     int i;
 
-    printf("Initial matrix: \n");
-    print_matrix(lnorm);
-    printf("\n");
-
     n = lnorm -> rows;
     /*allocate memory for eigenvalues array*/
-    eigen_valus_array = (double*)malloc(n * sizeof(double));
-    assert (eigen_valus_array != NULL && "An Error Has Occured");
+    eigen_values_array = (double*)malloc(n * sizeof(double));
+    assert (eigen_values_array != NULL && "An Error Has Occured");
     /*get eigenvectors and update eigenvalues array accordingly*/
-    eigen_vectors_matrix = get_eigen_vectors_and_values(lnorm, eigen_valus_array);
+    eigen_vectors_matrix = get_eigen_vectors_and_values(lnorm, eigen_values_array);
     if (strcmp(goal, "jacobi") == 0) {
         /*print eigenvalues*/
         for (i=0; i < n-1; i++) {
-            printf("%.4f,", eigen_valus_array[i]);
+            printf("%.4f,", eigen_values_array[i]);
         }
-        printf("%.4f\n", eigen_valus_array[n-1]);
+        printf("%.4f\n", eigen_values_array[n - 1]);
         /*If goal=jacobi: print eigenvectors*/
         print_matrix_transpose(eigen_vectors_matrix);
     }
     /*get initial indexes array i.e. [0,1,...,n-1] */
     indexes_array = get_initial_indexes_array(n);
     /*get eigengap k and preserve original indexes during sort*/
-    k = get_eigen_gap_k(eigen_valus_array, indexes_array, n);
+    k = get_eigen_gap_k(eigen_values_array, indexes_array, n);
     /*allocate memory for U - a n*k Matrix*/
     final_U_matrix = get_n_k_zero_matrix(n, k);
 
@@ -605,7 +601,7 @@ Matrix* run_jacobi (Matrix* lnorm, char* goal) {
     }
 
     free_matrix_memory(eigen_vectors_matrix);
-    free(eigen_valus_array);
+    free(eigen_values_array);
     free(indexes_array);
 
     return final_U_matrix;
