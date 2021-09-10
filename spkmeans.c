@@ -373,6 +373,7 @@ int get_num_points(FILE *file_ptr) {
     char ch;
     int curr_location;
 
+    curr_location = 0;
     while ((ch = fgetc(file_ptr)) != EOF) {
         if (ch == '\n') {
             count_points++;
@@ -571,6 +572,10 @@ Matrix* run_jacobi (Matrix* lnorm, char* goal) {
     int n;
     int k;
     int i;
+
+    printf("Initial matrix: \n");
+    print_matrix(lnorm);
+    printf("\n");
 
     n = lnorm -> rows;
     /*allocate memory for eigenvalues array*/
