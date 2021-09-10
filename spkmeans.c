@@ -628,7 +628,7 @@ int get_eigen_gap_k (double* eigen_valus_array, int* indexes_array, int array_le
     max_gap = fabs(eigen_valus_array[0] - eigen_valus_array[1]);
 
     /*Iterate rest of eigenValues*/
-    for (current_index = 0; current_index < (array_length - 1); current_index++) {
+    for (current_index = 0; current_index < array_length/2; current_index++) {
         current_gap = fabs(eigen_valus_array[current_index] - eigen_valus_array[current_index + 1]);
         /*In case of equality in the argmax of some eigengaps, use the lowest index - therefore we use > and not >=*/
         if (current_gap > max_gap) {
@@ -842,14 +842,22 @@ void run_spk(Matrix * points, int k) {
     }
     /***Print results***/
     for (i=0; i<k; i++) {
-        for (j=0; j<points->cols; j++) {
-            printf("%.4f", clusters[i]->curr_centroids[j]);
-            if (j != (points->cols -1)) {
-                printf(",");
+        for (j=0; j<points->cols-1; j++) {      
+            if (clusters[i]->curr_centroids[j] > -0.00005 && clusters[i]->curr_centroids[j] < 0.0) {
+                printf("%.4f,", clusters[i]->curr_centroids[j] * (-1));
+            }
+            else {
+                printf("%.4f,", clusters[i]->curr_centroids[j]);
             }
         }
-        printf("\n");
+        if (clusters[i]->curr_centroids[j] > -0.00005 && clusters[i]->curr_centroids[j] < 0.0) {
+            printf("%.4f\n", clusters[i]->curr_centroids[j] * (-1));
+        }
+        else {
+            printf("%.4f\n", clusters[i]->curr_centroids[j]);
+        }
     }
+
     free_clusters_memory(clusters, k);
 }
 
