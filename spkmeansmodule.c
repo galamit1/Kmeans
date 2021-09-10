@@ -2,8 +2,6 @@
 #include <Python.h>
 #include "spkmeans.h"
 
-#define KMEANS_EPSILON 0.001
-
 /*** Function Declaration ***/
 static PyObject* c_kmeans(PyObject* self, PyObject* args);
 static PyObject* c_spk(PyObject *self, PyObject *args);
@@ -238,7 +236,7 @@ static PyObject* c_get_t_matrix(PyObject *self, PyObject *args) {
     }
 
     free_matrix_memory(T_matrix);
-    
+
     return output_list;
 }
 

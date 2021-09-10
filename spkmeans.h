@@ -11,6 +11,7 @@
 #define MAXIMUM_DOUBLE 1.7E+308
 #define MAX_ITER 300
 #define EPSILON 1.0e-15
+#define KMEANS_EPSILON 0.001
 #define NUM_ITERATIONS 100
 
 /**********************/
