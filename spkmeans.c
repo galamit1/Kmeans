@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if ((k == 0) && ((strcmp(goal, "spk")) || (strcmp(goal, "jacobi"))))
+    if ((k == 0) && (strcmp(goal, "spk")))
     {
         Matrix* wam_matrix;
         Matrix* ddg_matrix;
@@ -76,7 +76,7 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     Matrix* ddg_matrix;
     Matrix* lnorm_matrix;
     Matrix* U_matrix;
-    Matrix* T_matrix;
+    /* Matrix* T_matrix; */
 
 
     if (strcmp(goal, "wam") == 0) {
@@ -109,16 +109,9 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     }
     if (strcmp(goal, "jacobi") == 0) {
         run = 1;
-        wam_matrix = run_wam(points_matrix);
-        ddg_matrix = run_ddg(wam_matrix);
-        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
-        lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        U_matrix = run_jacobi(lnorm_matrix, goal);
-        T_matrix = normalize_matrix(U_matrix);
-        free_matrix_memory(wam_matrix);
-        free_matrix_memory(ddg_matrix);
+        U_matrix = run_jacobi(points_matrix, goal);
+
         free_matrix_memory(U_matrix);
-        free_matrix_memory(T_matrix);
     }
     if (strcmp(goal, "spk") == 0) {
         run = 1;
