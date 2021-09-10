@@ -29,33 +29,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if ((k == 0) && (strcmp(goal, "spk") == 0))
-    {
-        Matrix* wam_matrix;
-        Matrix* ddg_matrix;
-        Matrix* lnorm_matrix;
-        Matrix* U_matrix;
-        Matrix* T_matrix;
-        
-        wam_matrix = run_wam(points_matrix);
-        ddg_matrix = run_ddg(wam_matrix);
-        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
-        lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        free_matrix_memory(wam_matrix);
-        free_matrix_memory(ddg_matrix);
-        U_matrix = run_jacobi(lnorm_matrix, goal);
-        T_matrix = normalize_matrix(U_matrix);
-
-        k = T_matrix->cols;
-        run_spk(T_matrix, k);
-        
-        free_matrix_memory(lnorm_matrix);
-        free_matrix_memory(U_matrix);
-        free_matrix_memory(T_matrix);
-        free_matrix_memory(points_matrix);
-        return 0;
-    }
-
     if (k >= points_matrix->rows) { /*so that k < number of points*/
         printf("Invalid Input!");
         free_matrix_memory(points_matrix);
@@ -72,7 +45,7 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     Matrix* ddg_matrix;
     Matrix* lnorm_matrix;
     Matrix* U_matrix;
-    /* Matrix* T_matrix; */
+    Matrix* T_matrix;
 
 
     if (strcmp(goal, "wam") == 0) {
@@ -111,12 +84,30 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     }
     if (strcmp(goal, "spk") == 0) {
         run = 1;
-        run_spk(points_matrix, k);
+        
+        wam_matrix = run_wam(points_matrix);
+        ddg_matrix = run_ddg(wam_matrix);
+        convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
+        lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
+        U_matrix = run_jacobi(lnorm_matrix, goal);
+        T_matrix = normalize_matrix(U_matrix);
+        
+        if (k == 0) {
+            k = T_matrix->cols;
+        }
+        run_spk(T_matrix, k);
+
+        free_matrix_memory(wam_matrix);
+        free_matrix_memory(ddg_matrix);
+        free_matrix_memory(lnorm_matrix);
+        free_matrix_memory(U_matrix);
+        free_matrix_memory(T_matrix);
     }
 
     if (run == 0) {
         printf("Invalid input");
     }
+    
     free_matrix_memory(points_matrix);
 }
 
