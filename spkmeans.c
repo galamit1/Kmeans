@@ -993,7 +993,7 @@ int update_all_clusters(Cluster **clusters, int k, int num_coordinates) {
         total_update += update_cluster_centroids_and_sum(clusters[i], num_coordinates);
     }
 
-    if (total_update == 0) {
+    if (total_update == 0.0) {
         /*no update was made*/
         return 1;
     }
