@@ -3,10 +3,10 @@
 #include "spkmeans.h"
 
 /*** Function Declaration ***/
-static PyObject* c_kmeans(PyObject* self, PyObject* args);
-static PyObject* c_spk(PyObject *self, PyObject *args);
-int python_list_of_lists_to_2D_array (PyObject *python_list_of_lists, double **target_array);
-Cluster** python_init_k_clusters (int k);
+static PyObject *c_kmeans(PyObject *self, PyObject *args);
+static PyObject *c_spk(PyObject *self, PyObject *args);
+int python_list_of_lists_to_2D_array(PyObject *python_list_of_lists, double **target_array);
+Cluster **python_init_k_clusters(int k);
 PyMODINIT_FUNC PyInit_myspkmeans(void);
 
 
@@ -14,7 +14,7 @@ PyMODINIT_FUNC PyInit_myspkmeans(void);
 /*** run functions from goal ***/
 /*******************************/
 
-static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
+static PyObject *c_spkmeans(PyObject *self, PyObject *args) {
     /*Define variables to receive from user*/
     int max_iter = 300;
     char *goal;
@@ -22,7 +22,7 @@ static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
     int num_coordinates;
     PyObject *data_points;
     double **points;
-    Matrix * points_matrix;
+    Matrix *points_matrix;
 
 
     /* Parse arguments from Python */
@@ -59,7 +59,7 @@ static PyObject* c_spkmeans(PyObject *self, PyObject *args) {
 /*** spk function ***/
 /*******************************/
 
-static PyObject* c_spk(PyObject *self, PyObject *args) {
+static PyObject *c_spk(PyObject *self, PyObject *args) {
     /*Define variables to receive from user*/
     int k;
     int max_iter = 300;
@@ -82,7 +82,7 @@ static PyObject* c_spk(PyObject *self, PyObject *args) {
 
 
     /* Parse arguments from Python */
-    if((!PyArg_ParseTuple(args, "OOiii", &data_points, &initial_centroids, &k, &num_points, &num_coordinates))) {
+    if ((!PyArg_ParseTuple(args, "OOiii", &data_points, &initial_centroids, &k, &num_points, &num_coordinates))) {
         return NULL; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
     }
 
@@ -107,17 +107,18 @@ static PyObject* c_spk(PyObject *self, PyObject *args) {
         return NULL;
     }
 
-    for (i=0; i<k; i++) {
+    for (i = 0; i < k; i++) {
         clusters[i] = make_cluster(initial_points_for_centroids[i], num_coordinates, i);
     }
 
-    free_points_memory(initial_points_for_centroids, k); /*we don't need this 2D array anymore since initial centroids are now stored in clusters*/
+    free_points_memory(initial_points_for_centroids,
+                       k); /*we don't need this 2D array anymore since initial centroids are now stored in clusters*/
 
     /***Execute k-means algorithm***/
     did_update = 0;
 
-    for (i=0; i<max_iter; i++) {
-        for (j=0; j<num_points; j++) {
+    for (i = 0; i < max_iter; i++) {
+        for (j = 0; j < num_points; j++) {
             point = points[j];
             find_minimum_distance(clusters, point, k, num_coordinates);
         }
@@ -136,17 +137,18 @@ static PyObject* c_spk(PyObject *self, PyObject *args) {
     if (centroids_output_list == NULL) {
         return NULL;
     }
-    for (i=0; i<k; i++) {
+    for (i = 0; i < k; i++) {
         single_centroid_list = PyList_New(output_num_coordinates); /*Create single centroid list*/
         if (single_centroid_list == NULL) {
             return NULL;
         }
-        for (j=0; j<num_coordinates; j++) {
+        for (j = 0; j < num_coordinates; j++) {
             output_coordinate_item = PyFloat_FromDouble(clusters[i]->curr_centroids[j]);
             if (output_coordinate_item == NULL) {
                 return NULL;
             }
-            PyList_SET_ITEM(single_centroid_list, j, output_coordinate_item); /*user macro version of PyList_setItem() since there's no previous content*/
+            PyList_SET_ITEM(single_centroid_list, j,
+                            output_coordinate_item); /*user macro version of PyList_setItem() since there's no previous content*/
         }
         PyList_SET_ITEM(centroids_output_list, i, single_centroid_list);
     }
@@ -156,7 +158,7 @@ static PyObject* c_spk(PyObject *self, PyObject *args) {
     return centroids_output_list;
 }
 
-static PyObject* c_get_t_matrix(PyObject *self, PyObject *args) {
+static PyObject *c_get_t_matrix(PyObject *self, PyObject *args) {
     /*Define variables to receive from user*/
     int k;
     int num_points;
@@ -171,16 +173,16 @@ static PyObject* c_get_t_matrix(PyObject *self, PyObject *args) {
     PyObject *output_list;
     PyObject *single_line;
     PyObject *output_coordinate_item;
-    Matrix* points_matrix;
-    Matrix* wam_matrix;
-    Matrix* ddg_matrix;
-    Matrix* lnorm_matrix;
-    Matrix* U_matrix;
-    Matrix* T_matrix;
+    Matrix *points_matrix;
+    Matrix *wam_matrix;
+    Matrix *ddg_matrix;
+    Matrix *lnorm_matrix;
+    Matrix *U_matrix;
+    Matrix *T_matrix;
 
 
     /* Parse arguments from Python */
-    if((!PyArg_ParseTuple(args, "Oiii", &data_points, &k, &num_points, &num_coordinates))) {
+    if ((!PyArg_ParseTuple(args, "Oiii", &data_points, &k, &num_points, &num_coordinates))) {
         return NULL; /*In the CPython API, Null is never a valid value for a PyObject* - so it signals an error*/
     }
 
@@ -220,17 +222,18 @@ static PyObject* c_get_t_matrix(PyObject *self, PyObject *args) {
     if (output_list == NULL) {
         return NULL;
     }
-    for (i=0; i<T_matrix->rows; i++) {
+    for (i = 0; i < T_matrix->rows; i++) {
         single_line = PyList_New(output_num_coordinates); /*Create single line*/
         if (single_line == NULL) {
             return NULL;
         }
-        for (j=0; j<T_matrix->cols; j++) {
+        for (j = 0; j < T_matrix->cols; j++) {
             output_coordinate_item = PyFloat_FromDouble(T_matrix->cells[i][j]);
             if (output_coordinate_item == NULL) {
                 return NULL;
             }
-            PyList_SET_ITEM(single_line, j, output_coordinate_item); /*user macro version of PyList_setItem() since there's no previous content*/
+            PyList_SET_ITEM(single_line, j,
+                            output_coordinate_item); /*user macro version of PyList_setItem() since there's no previous content*/
         }
         PyList_SET_ITEM(output_list, i, single_line);
     }
@@ -247,23 +250,23 @@ static PyObject* c_get_t_matrix(PyObject *self, PyObject *args) {
 static PyMethodDef _methods[] = {
         {"run_module",
                 (PyCFunction) c_spkmeans,
-                METH_VARARGS,
-                        PyDoc_STR("Run functions according to goal."),
+                     METH_VARARGS,
+                PyDoc_STR("Run functions according to goal."),
         },
         {"run_spk_module",
                 (PyCFunction) c_spk,
-                METH_VARARGS,
+                     METH_VARARGS,
                 PyDoc_STR("Kmeans execution with given initial centroids."),
         },
         {"get_points_for_spk",
-            (PyCFunction) c_get_t_matrix,
-            METH_VARARGS,
-            PyDoc_STR("return the calculated T matrix."),
+                (PyCFunction) c_get_t_matrix,
+                     METH_VARARGS,
+                PyDoc_STR("return the calculated T matrix."),
         },
         {NULL, NULL, 0, NULL} /*Sentinel*/
 };
 
-static struct PyModuleDef _moduledef  = {
+static struct PyModuleDef _moduledef = {
         PyModuleDef_HEAD_INIT,
         "myspkmeans",
         NULL,
@@ -271,8 +274,7 @@ static struct PyModuleDef _moduledef  = {
         _methods
 };
 
-PyMODINIT_FUNC PyInit_myspkmeans(void)
-{
+PyMODINIT_FUNC PyInit_myspkmeans(void) {
     PyObject *m;
     m = PyModule_Create(&_moduledef);
     if (!m) {
@@ -285,7 +287,7 @@ PyMODINIT_FUNC PyInit_myspkmeans(void)
 /*** Function Implementation ***/
 /*******************************/
 
-int python_list_of_lists_to_2D_array (PyObject *python_list_of_lists, double **target_array) {
+int python_list_of_lists_to_2D_array(PyObject *python_list_of_lists, double **target_array) {
     Py_ssize_t list_size;
     Py_ssize_t entry_size;
     PyObject *point_item;
@@ -294,13 +296,13 @@ int python_list_of_lists_to_2D_array (PyObject *python_list_of_lists, double **t
     int j;
 
     list_size = PyList_Size(python_list_of_lists); /*equivilant to len(_list) in Python*/
-    for (i=0; i<list_size; i++) { /*iterate over points*/
+    for (i = 0; i < list_size; i++) { /*iterate over points*/
         point_item = PyList_GetItem(python_list_of_lists, i);
         if (!PyList_Check(point_item)) {
             return 1;
         }
         entry_size = PyList_Size(point_item);
-        for (j=0; j<entry_size; j++) { /*iterate over coordinates of single point*/
+        for (j = 0; j < entry_size; j++) { /*iterate over coordinates of single point*/
             coordinate_item = PyList_GetItem(point_item, j);
             if (!PyFloat_Check(coordinate_item)) {
                 return 1;
@@ -311,14 +313,14 @@ int python_list_of_lists_to_2D_array (PyObject *python_list_of_lists, double **t
     return 0;
 }
 
-Cluster** python_init_k_clusters (int k) {
+Cluster **python_init_k_clusters(int k) {
     /*
     Recieves pointer to 2D array of points, k, number of coordinates and 2D array of initial indexes,
     Returns new 2D array of Clusters with sufficient memory, initialized with the first k points.
     */
     Cluster **clusters;
 
-    clusters = malloc(sizeof(Cluster*) * k);
+    clusters = malloc(sizeof(Cluster *) * k);
     assert (clusters != NULL);
 
     return clusters;

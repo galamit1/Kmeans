@@ -37,7 +37,8 @@ def run_spk(points, k):
         centroids = np.append(centroids, points[[centroids_indexes[-1]]], axis=0)
     print(COORDINATES_SEPARATOR.join([str(c) for c in centroids_indexes]))
     centroids_output = myspkmeans.run_spk_module(points.tolist(), centroids.tolist(), k, len(points), len(points[0]))
-    print(POINTS_SEPARATOR.join([COORDINATES_SEPARATOR.join([normalize_num(c) for c in centroid]) for centroid in centroids_output]))
+    print(POINTS_SEPARATOR.join(
+        [COORDINATES_SEPARATOR.join([normalize_num(c) for c in centroid]) for centroid in centroids_output]))
 
 
 def main():

@@ -1,7 +1,7 @@
 #include "spkmeans.h"
 
 /**********************/
-/*MAIN FUNCTION*/
+/**MAIN FUNCTION**/
 /**********************/
 
 int main(int argc, char **argv) {
@@ -9,12 +9,13 @@ int main(int argc, char **argv) {
     int k;
     char goal[7];
     char filePath[1000];
-    Matrix * points_matrix;
+    Matrix *points_matrix;
 
     if (argc != 4) {
         printf("Invalid Input!");
         return 1;
     }
+    /* assuming the input is valid */
     sscanf(argv[1], "%d", &k);
     sscanf(argv[2], "%s", goal);
     sscanf(argv[3], "%s", filePath);
@@ -39,13 +40,14 @@ int main(int argc, char **argv) {
 }
 
 
-void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k) {
+void run_functions_according_to_goal(char *goal, Matrix *points_matrix, int k) {
+    /* check what the goal is and run the right function */
     int run = 0;
-    Matrix* wam_matrix;
-    Matrix* ddg_matrix;
-    Matrix* lnorm_matrix;
-    Matrix* U_matrix;
-    Matrix* T_matrix;
+    Matrix *wam_matrix;
+    Matrix *ddg_matrix;
+    Matrix *lnorm_matrix;
+    Matrix *U_matrix;
+    Matrix *T_matrix;
 
 
     if (strcmp(goal, "wam") == 0) {
@@ -84,14 +86,13 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
     }
     if (strcmp(goal, "spk") == 0) {
         run = 1;
-        
         wam_matrix = run_wam(points_matrix);
         ddg_matrix = run_ddg(wam_matrix);
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
         U_matrix = run_jacobi(lnorm_matrix, goal);
         T_matrix = normalize_matrix(U_matrix);
-        
+
         if (k == 0) {
             k = T_matrix->cols;
         }
@@ -116,218 +117,201 @@ void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k)
 /**********************/
 
 /*Recieves 2D array of doubles and its dimentions, returns Matrix with same content, including memory allocation (for Matrix pointer only - not for Matrix contents)*/
-Matrix* get_matrix_from_2D_array (double** points, int num_points, int num_coordinates) {
-    Matrix* output;
+Matrix *get_matrix_from_2D_array(double **points, int num_points, int num_coordinates) {
+    Matrix *output;
 
     /*allocate memory*/
-    output = (Matrix*)malloc(sizeof(Matrix));
+    output = (Matrix *) malloc(sizeof(Matrix));
     assert (output != NULL && "An Error Has Occured");
     /*initialize parameters, including n*n matrix with memory*/
-    output -> rows = num_points;
-    output -> cols = num_coordinates;
-    output -> cells = points;
+    output->rows = num_points;
+    output->cols = num_coordinates;
+    output->cells = points;
 
     return output;
 }
 
 /*Receives Matrix and prints it - 4 decimal points*/
-void print_matrix (Matrix* m) {
-    int i,j;
-    for (i=0; i < m -> rows; i++) {
-        for (j=0; j < m -> cols - 1; j++) {
-            if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) {
+void print_matrix(Matrix *m) {
+    int i, j;
+    for (i = 0; i < m->rows; i++) {
+        for (j = 0; j < m->cols - 1; j++) {
+            if (m->cells[i][j] > -0.00005 && m->cells[i][j] < 0.0) {
                 printf("%.4f,", m->cells[i][j] * (-1));
+            } else {
+                printf("%.4f,", m->cells[i][j]);
             }
-            else {
-                printf("%.4f,", m -> cells[i][j]);
-            }
-         }
-         if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) {
-             printf("%.4f\n", m -> cells[i][j] * (-1));
-         }
-         else {
-             printf("%.4f\n", m -> cells[i][j]);
-         }
-     }
+        }
+        if (m->cells[i][j] > -0.00005 && m->cells[i][j] < 0.0) {
+            printf("%.4f\n", m->cells[i][j] * (-1));
+        } else {
+            printf("%.4f\n", m->cells[i][j]);
+        }
+    }
 }
 
 /*Receives Matrix and prints its transpose - 4 decimal points*/
-void print_matrix_transpose(Matrix* m) {
-    int i,j;
-    for (j=0; j < m -> cols; j++) {
-        for (i=0; i < m -> rows - 1; i++) {
-            if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) {
+void print_matrix_transpose(Matrix *m) {
+    int i, j;
+    for (j = 0; j < m->cols; j++) {
+        for (i = 0; i < m->rows - 1; i++) {
+            if (m->cells[i][j] > -0.00005 && m->cells[i][j] < 0.0) {
                 printf("%.4f,", m->cells[i][j] * (-1));
+            } else {
+                printf("%.4f,", m->cells[i][j]);
             }
-            else {
-                printf("%.4f,", m -> cells[i][j]);
-            }
-         }
-         if (m -> cells[i][j] > -0.00005 && m -> cells[i][j] < 0.0) {
-             printf("%.4f\n", m -> cells[i][j] * (-1));
-         }
-         else {
-             printf("%.4f\n", m -> cells[i][j]);
-         }
-     }
+        }
+        if (m->cells[i][j] > -0.00005 && m->cells[i][j] < 0.0) {
+            printf("%.4f\n", m->cells[i][j] * (-1));
+        } else {
+            printf("%.4f\n", m->cells[i][j]);
+        }
+    }
 }
 
 
 /*Receives Matrix and prints it as is*/
-void print_full_matrix (Matrix* m) {
-    int i,j;
-    for (i=0; i < m -> rows; i++) {
-        for (j=0; j < m -> cols - 1; j++) {
-            printf("%f,", m -> cells[i][j]);
+void print_full_matrix(Matrix *m) {
+    int i, j;
+    for (i = 0; i < m->rows; i++) {
+        for (j = 0; j < m->cols - 1; j++) {
+            printf("%f,", m->cells[i][j]);
         }
-        printf("%f\n", m -> cells[i][j]);
+        printf("%f\n", m->cells[i][j]);
     }
 }
 
 /*Recieves integer n, allocates memory and returns n*n zeros matrix*/
-Matrix* get_zeros_matrix_size_n (int n) {
-    Matrix* zeros_matrix;
+Matrix *get_zeros_matrix_size_n(int n) {
+    Matrix *zeros_matrix;
     int i;
 
     zeros_matrix = malloc(sizeof(Matrix));
     assert (zeros_matrix != NULL && "An Error Has Occured");
     /*initialize parameters, including n*n matrix with memory*/
-    zeros_matrix -> rows = n;
-    zeros_matrix -> cols = n;
-    zeros_matrix -> cells = malloc(n * sizeof(double*));
-    for (i=0; i < n; i++) {
-        zeros_matrix -> cells[i] = calloc(n, sizeof(double));
-        assert (zeros_matrix -> cells[i] != NULL && "An Error Has Occured");
+    zeros_matrix->rows = n;
+    zeros_matrix->cols = n;
+    zeros_matrix->cells = malloc(n * sizeof(double *));
+    for (i = 0; i < n; i++) {
+        zeros_matrix->cells[i] = calloc(n, sizeof(double));
+        assert (zeros_matrix->cells[i] != NULL && "An Error Has Occured");
     }
     return zeros_matrix;
 }
 
 /*Recieves integers n & k, allocates memory and returns n*k zeros matrix*/
-Matrix* get_n_k_zero_matrix (int n, int k) {
-    Matrix* nk_matrix;
+Matrix *get_n_k_zero_matrix(int n, int k) {
+    Matrix *nk_matrix;
     int i;
 
-    nk_matrix = (Matrix*)malloc(sizeof(Matrix));
+    nk_matrix = (Matrix *) malloc(sizeof(Matrix));
     assert (nk_matrix != NULL && "An Error Has Occured");
     /*initialize parameters, including n*k matrix with memory*/
-    nk_matrix -> rows = n;
-    nk_matrix -> cols = k;
-    nk_matrix -> cells = malloc(n * sizeof(double*));
-    assert (nk_matrix -> cells != NULL && "An Error Has Occured"); 
-    for (i=0; i < n; i++) {
-        nk_matrix -> cells[i] = calloc(n, sizeof(double));
-        assert (nk_matrix -> cells[i] != NULL && "An Error Has Occured");
+    nk_matrix->rows = n;
+    nk_matrix->cols = k;
+    nk_matrix->cells = malloc(n * sizeof(double *));
+    assert (nk_matrix->cells != NULL && "An Error Has Occured");
+    for (i = 0; i < n; i++) {
+        nk_matrix->cells[i] = calloc(n, sizeof(double));
+        assert (nk_matrix->cells[i] != NULL && "An Error Has Occured");
     }
     return nk_matrix;
 }
 
 /*Recieves integer n, allocates memory and returns n*n identity matrix*/
-Matrix* get_identity_matrix_size_n (int n) {
+Matrix *get_identity_matrix_size_n(int n) {
     int i;
-    Matrix* identity;
+    Matrix *identity;
 
     /*use get_zeros_matrix_size_n for memory allocation and matrix creation*/
     identity = get_zeros_matrix_size_n(n);
 
     /*set diagonal to 1*/
-    for (i=0; i < n; i++) {
-        identity -> cells[i][i] = 1;
+    for (i = 0; i < n; i++) {
+        identity->cells[i][i] = 1;
     }
 
     return identity;
 }
 
 /*Recieves symmetric matrix and returns Cell with largest absolute value (above diagonal)*/
-void get_cell_with_largest_value (Matrix* m, Cell* cell_pointer) {
-    int i,j;
+void get_cell_with_largest_value(Matrix *m, Cell *cell_pointer) {
+    int i, j;
     double curr_absolute_value;
-    Cell* largest_cell;
+    Cell *largest_cell;
     /*Initialize cell*/
-    largest_cell = (Cell*)malloc(sizeof(Cell));
-    largest_cell -> row = -1;
-    largest_cell -> col = -1;
-    largest_cell -> value = -MAXIMUM_DOUBLE;
+    largest_cell = (Cell *) malloc(sizeof(Cell));
+    largest_cell->row = -1;
+    largest_cell->col = -1;
+    largest_cell->value = -MAXIMUM_DOUBLE;
     /*find largest absolute value and update largest_cell accordingly*/
-    for (i=0; i < m -> rows; i++) {
-        for (j=i+1; j < m -> cols; j++) {
-            curr_absolute_value = fabs(m -> cells[i][j]);
-            if (curr_absolute_value > largest_cell -> value) {
-                largest_cell -> row = i;
-                largest_cell -> col = j;
-                largest_cell -> value = curr_absolute_value;
+    for (i = 0; i < m->rows; i++) {
+        for (j = i + 1; j < m->cols; j++) {
+            curr_absolute_value = fabs(m->cells[i][j]);
+            if (curr_absolute_value > largest_cell->value) {
+                largest_cell->row = i;
+                largest_cell->col = j;
+                largest_cell->value = curr_absolute_value;
             }
         }
     }
 
-    cell_pointer -> row = largest_cell -> row;
-    cell_pointer -> col = largest_cell -> col;
-    cell_pointer -> value = largest_cell -> value;
+    cell_pointer->row = largest_cell->row;
+    cell_pointer->col = largest_cell->col;
+    cell_pointer->value = largest_cell->value;
     free(largest_cell);
 }
 
-/*Recieves symmetric matrix and checks wether it's diagonal or not*/
-int is_diagonal_matrix (Matrix* m) {
-    int i,j;
-    /*check if there's a non-zero element above diagonal*/
-    for (i=0; i < m -> rows; i++) {
-        for (j=i+1; j < m -> cols; j++) {
-            if (m -> cells[i][j] != 0)
-                return 0;
-        }
-    }
-    return 1;    
-}
 
 /*Recieves number and returns its sign*/
-double sign (double num) {
+double sign(double num) {
     if (num >= 0)
         return 1.0;
     return -1.0;
 }
 
 /*Recieves 3 n*n symmetric matrices, multiplies first 2 and stores the result in product*/
-void multiply_matrices_to_existing_pointer (Matrix* m1, Matrix* m2, Matrix* product) {
-    int i,j, k;
+void multiply_matrices_to_existing_pointer(Matrix *m1, Matrix *m2, Matrix *product) {
+    int i, j, k;
 
     /*preform regular matrix multiplication - store result in product*/
-    for (i=0; i < product -> rows; i++) {
-        for (j=0; j < product -> rows; j++) {
-            product -> cells[i][j] = 0;
-            for (k=0; k < product -> rows; k++) {
-                product -> cells[i][j] += (m1 -> cells[i][k])*(m2 -> cells[k][j]);
+    for (i = 0; i < product->rows; i++) {
+        for (j = 0; j < product->rows; j++) {
+            product->cells[i][j] = 0;
+            for (k = 0; k < product->rows; k++) {
+                product->cells[i][j] += (m1->cells[i][k]) * (m2->cells[k][j]);
             }
         }
     }
 }
 
-/*Recieves symmetric matrix and frees its memory*/
-void free_matrix_memory (Matrix* m) {
-    int n = m -> rows;
+/*Recieves symmetric matrix and frees its memory, the cells are double**   */
+void free_matrix_memory(Matrix *m) {
     int i;
 
     if (m != NULL) {
         if (m->cells != NULL) {
-            for (i=0; i < n; i++) {
-                if (m-> cells[i] != NULL) {
-                    free(m -> cells[i]);
+            for (i = 0; i < m->rows; i++) {
+                if (m->cells[i] != NULL) {
+                    free(m->cells[i]);
                 }
             }
-            free(m -> cells);
+            free(m->cells);
         }
         free(m);
     }
 }
 
 /*Recieves matrix, allocates memory and returns copy of original matrix*/
-Matrix* get_copy_of_matrix(Matrix* original) {
-    Matrix* new_matrix;
-    int i,j;
+Matrix *get_copy_of_matrix(Matrix *original) {
+    Matrix *new_matrix;
+    int i, j;
 
-    new_matrix = get_n_k_zero_matrix(original -> rows, original -> cols);
+    new_matrix = get_n_k_zero_matrix(original->rows, original->cols);
     /*Update values do be identical*/
-    for (i=0; i < original -> rows; i++) {
-        for (j=0; j < original -> cols; j++) {
-            new_matrix -> cells[i][j] = original -> cells[i][j];
+    for (i = 0; i < original->rows; i++) {
+        for (j = 0; j < original->cols; j++) {
+            new_matrix->cells[i][j] = original->cells[i][j];
         }
     }
 
@@ -335,25 +319,25 @@ Matrix* get_copy_of_matrix(Matrix* original) {
 }
 
 /*Recieves matrix, allocates memory and returns a normalized matrix*/
-Matrix* normalize_matrix (Matrix* original) {
-    Matrix* normalized_matrix;
-    int i,j;
+Matrix *normalize_matrix(Matrix *original) {
+    Matrix *normalized_matrix;
+    int i, j;
     double current_row_squares_sum, sqrt_current_row_sum;
 
     /*Start from copy of original matrix*/
     normalized_matrix = get_copy_of_matrix(original);
     /*Iterate rows*/
-    for (i=0; i < original -> rows; i++) {
+    for (i = 0; i < original->rows; i++) {
         /*Calculate row sum and the sqrt of it*/
         current_row_squares_sum = 0;
-        for (j=0; j < original -> cols; j++) {
-            current_row_squares_sum += pow(original -> cells[i][j], 2);
+        for (j = 0; j < original->cols; j++) {
+            current_row_squares_sum += pow(original->cells[i][j], 2);
         }
         sqrt_current_row_sum = sqrt(current_row_squares_sum);
 
         /*Set normalized value for each row element accordingly*/
-        for (j=0; j < original -> cols; j++) {
-            normalized_matrix -> cells[i][j] = (original -> cells[i][j]) / sqrt_current_row_sum;
+        for (j = 0; j < original->cols; j++) {
+            normalized_matrix->cells[i][j] = (original->cells[i][j]) / sqrt_current_row_sum;
         }
     }
 
@@ -375,11 +359,10 @@ int get_num_points(FILE *file_ptr) {
         if (ch == '\n') {
             count_points++;
             curr_location = ftell(file_ptr);
-
         }
     }
     if (curr_location == ftell(file_ptr)) { /* there is an extra \n at the end of the file*/
-        count_points --;
+        count_points--;
     }
     rewind(file_ptr);
     return count_points;
@@ -399,7 +382,7 @@ int get_num_coordinates(FILE *file_ptr) {
 }
 
 /*Recieves number of points & coordinates along with FILE pointer and empty 2D points array, fills array with points from file*/
-void get_points_from_file (FILE *file_ptr, double** points) {
+void get_points_from_file(FILE *file_ptr, double **points) {
     int current_line;
     char single_line[LINE_SIZE];
 
@@ -408,16 +391,15 @@ void get_points_from_file (FILE *file_ptr, double** points) {
     assert(fgets(single_line, LINE_SIZE, file_ptr) != NULL && "An Error Has Occured");
     /*already read first line so use do-while*/
     do {
-       single_line_to_point(points[current_line], single_line);
+        single_line_to_point(points[current_line], single_line);
         current_line++;
-    }  
-    while (fgets(single_line, LINE_SIZE, file_ptr) != NULL); 
+    } while (fgets(single_line, LINE_SIZE, file_ptr) != NULL);
 }
 
 /*Recieves pointer to single point and single line (as string), inserts coordinates (as double) to point*/
-void single_line_to_point (double* point, char* single_line) {
-    char* token;
-    char* pointer;
+void single_line_to_point(double *point, char *single_line) {
+    char *token;
+    char *pointer;
     int index;
 
     index = 0;
@@ -430,12 +412,12 @@ void single_line_to_point (double* point, char* single_line) {
 }
 
 /*Receives path to file and returns 2D matrix with all points, including memory allocation and closing the pointer*/
-Matrix* get_points_matrix (char *path) {
-    Matrix * points_matrix;
+Matrix *get_points_matrix(char *path) {
+    Matrix *points_matrix;
     FILE *file_ptr;
-    double** points;
+    double **points;
     int num_points, num_coordinates;
-    int i,j;
+    int i, j;
 
     points_matrix = malloc(sizeof(Matrix));
 
@@ -444,15 +426,15 @@ Matrix* get_points_matrix (char *path) {
         num_coordinates = get_num_coordinates(file_ptr);
 
         /*Allocate memory for 2D-array*/
-        points = (double**)malloc(num_points * sizeof(double*));
+        points = (double **) malloc(num_points * sizeof(double *));
         if (points == NULL) {
             free(points_matrix);
             return NULL;
         }
-        for (i=0; i < num_points; i++) {
-            points[i] = (double*)malloc(num_coordinates * sizeof(double));
+        for (i = 0; i < num_points; i++) {
+            points[i] = (double *) malloc(num_coordinates * sizeof(double));
             if (points[i] == NULL) {
-                for (j=0; j < i; j++) {
+                for (j = 0; j < i; j++) {
                     free(points[i]);
                 }
                 free(points);
@@ -461,8 +443,8 @@ Matrix* get_points_matrix (char *path) {
             }
         }
 
-    /*Fill array with parsed values from files*/
-    get_points_from_file(file_ptr , points);
+        /*Fill array with parsed values from files*/
+        get_points_from_file(file_ptr, points);
     } else {
         free(points_matrix);
         return NULL;
@@ -472,7 +454,7 @@ Matrix* get_points_matrix (char *path) {
     points_matrix->cells = points;
     points_matrix->rows = num_points;
     points_matrix->cols = num_coordinates;
-    
+
     return points_matrix;
 }
 
@@ -481,13 +463,13 @@ Matrix* get_points_matrix (char *path) {
 /*******************************/
 
 /*Recieves matrix, allocates memory and creates its W matrix*/
-Matrix * run_wam(Matrix * points) {
-    Matrix * wam_matrix;
+Matrix *run_wam(Matrix *points) {
+    Matrix *wam_matrix;
     double weight;
-    int i,j;
+    int i, j;
 
     wam_matrix = get_zeros_matrix_size_n(points->rows);
-    for (i=0; i < points->rows; i++) {
+    for (i = 0; i < points->rows; i++) {
         for (j = i + 1; j < points->rows; j++) {
             weight = calculate_weight(points->cells[i], points->cells[j], points->cols);
             wam_matrix->cells[i][j] = weight;
@@ -497,8 +479,8 @@ Matrix * run_wam(Matrix * points) {
     return wam_matrix;
 }
 
-/*Recieves 2 datapoints and num_coordinates, reterns the weight between both points*/
-double calculate_weight(double * point1, double * point2, int num_coordinates) {
+/*Recieves 2 datapoints and num_coordinates, returns the weight between both points*/
+double calculate_weight(double *point1, double *point2, int num_coordinates) {
     double weight;
     int i;
 
@@ -513,13 +495,13 @@ double calculate_weight(double * point1, double * point2, int num_coordinates) {
 /*** DDG FUNCTIONS ***/
 /*******************************/
 /*Receives W matrix, allocates memory and creates its D matrix*/
-Matrix * run_ddg(Matrix * wam) {
-    Matrix * ddg_matrix;
+Matrix *run_ddg(Matrix *wam) {
+    Matrix *ddg_matrix;
     double row_sum;
-    int i,z;
+    int i, z;
 
     ddg_matrix = get_zeros_matrix_size_n(wam->rows);
-    for (i=0; i < wam->rows; i++) {
+    for (i = 0; i < wam->rows; i++) {
         row_sum = 0;
         for (z = 0; z < wam->cols; z++) {
             row_sum += wam->cells[i][z];
@@ -530,9 +512,9 @@ Matrix * run_ddg(Matrix * wam) {
 }
 
 /*Receives D matrix and converts it in-place to D^-1/2*/
-void convert_ddg_with_the_pow_of_minus_half(Matrix * ddg_matrix) {
+void convert_ddg_with_the_pow_of_minus_half(Matrix *ddg_matrix) {
     int i;
-    for (i=0; i < ddg_matrix->rows; i++) {
+    for (i = 0; i < ddg_matrix->rows; i++) {
         ddg_matrix->cells[i][i] = pow(ddg_matrix->cells[i][i], -0.5);
     }
 }
@@ -541,11 +523,11 @@ void convert_ddg_with_the_pow_of_minus_half(Matrix * ddg_matrix) {
 /*** LNORM FUNCTIONS ***/
 /*******************************/
 /*Receives W & D matrixes, computes and returns their lnorm*/
-Matrix * run_lnorm(Matrix * wam, Matrix * ddg) {
-    Matrix * lnorm;
+Matrix *run_lnorm(Matrix *wam, Matrix *ddg) {
+    Matrix *lnorm;
     double value;
-    int i,j;
-    
+    int i, j;
+
     lnorm = get_identity_matrix_size_n(wam->rows);
     for (i = 0; i < wam->rows; ++i) {
         for (j = i + 1; j < wam->rows; ++j) {
@@ -561,26 +543,26 @@ Matrix * run_lnorm(Matrix * wam, Matrix * ddg) {
 /*** JACOBI FUNCTIONS ***/
 /*******************************/
 /*Recieves lnorm symmetric matrix, runs jacobi algorithm and returns n*k matrix U  containing the first k eigenvectors u1, . . . , uk of Lnorm columns. K is inferred by matrix size*/
-Matrix* run_jacobi (Matrix* lnorm, char* goal) {
-    Matrix* eigen_vectors_matrix;
-    Matrix* final_U_matrix;
-    Matrix* lnorm_copy;
-    double* eigen_values_array;
-    int* indexes_array;
+Matrix *run_jacobi(Matrix *lnorm, char *goal) {
+    Matrix *eigen_vectors_matrix;
+    Matrix *final_U_matrix;
+    Matrix *lnorm_copy;
+    double *eigen_values_array;
+    int *indexes_array;
     int n;
     int k;
     int i;
 
-    n = lnorm -> rows;
+    n = lnorm->rows;
     /*allocate memory for eigenvalues array*/
-    eigen_values_array = (double*)malloc(n * sizeof(double));
+    eigen_values_array = (double *) malloc(n * sizeof(double));
     assert (eigen_values_array != NULL && "An Error Has Occured");
     /*get eigenvectors and update eigenvalues array accordingly*/
     lnorm_copy = get_copy_of_matrix(lnorm); /*work with deep copy of lnorm to avoid freeing issues*/
     eigen_vectors_matrix = get_eigen_vectors_and_values(lnorm_copy, eigen_values_array);
     if (strcmp(goal, "jacobi") == 0) {
         /*print eigenvalues*/
-        for (i=0; i < n-1; i++) {
+        for (i = 0; i < n - 1; i++) {
             printf("%.4f,", eigen_values_array[i]);
         }
         printf("%.4f\n", eigen_values_array[n - 1]);
@@ -595,7 +577,7 @@ Matrix* run_jacobi (Matrix* lnorm, char* goal) {
     final_U_matrix = get_n_k_zero_matrix(n, k);
 
     /*point to k eigenvectors that correspond to k smallest eigenvalues*/
-    for (i=0; i < k; i++) {
+    for (i = 0; i < k; i++) {
         get_column_by_index(final_U_matrix, eigen_vectors_matrix, i, indexes_array[i], n);
     }
 
@@ -607,16 +589,16 @@ Matrix* run_jacobi (Matrix* lnorm, char* goal) {
 }
 
 /*Receive 2 Matrixes, column size and column indexes for both matrixes, copy column from relevant index in m2 to relevant index in m1*/
-void get_column_by_index(Matrix* m1, Matrix* m2, int m1_index, int m2_index, int column_size) {
+void get_column_by_index(Matrix *m1, Matrix *m2, int m1_index, int m2_index, int column_size) {
     int i;
 
-    for (i=0; i < column_size; i++) {
-        m1 -> cells[i][m1_index] = m2 -> cells[i][m2_index];
+    for (i = 0; i < column_size; i++) {
+        m1->cells[i][m1_index] = m2->cells[i][m2_index];
     }
 }
 
 /*Recieve eigenvalues array & initial indexes array, calculate k by eigengap heuristic and update indexes array along with sorting values array*/
-int get_eigen_gap_k (double* eigen_valus_array, int* indexes_array, int array_length) {
+int get_eigen_gap_k(double *eigen_valus_array, int *indexes_array, int array_length) {
     double max_gap, current_gap;
     int max_index, current_index;
 
@@ -628,7 +610,7 @@ int get_eigen_gap_k (double* eigen_valus_array, int* indexes_array, int array_le
     max_gap = fabs(eigen_valus_array[0] - eigen_valus_array[1]);
 
     /*Iterate rest of eigenValues*/
-    for (current_index = 0; current_index < array_length/2; current_index++) {
+    for (current_index = 0; current_index < array_length / 2; current_index++) {
         current_gap = fabs(eigen_valus_array[current_index] - eigen_valus_array[current_index + 1]);
         /*In case of equality in the argmax of some eigengaps, use the lowest index - therefore we use > and not >=*/
         if (current_gap > max_gap) {
@@ -649,6 +631,7 @@ void swap_doubles(double *xp, double *yp) {
     *xp = *yp;
     *yp = temp;
 }
+
 /*Recieve 2 int pointers and swap them*/
 void swap_ints(int *xp, int *yp) {
     int temp = *xp;
@@ -657,28 +640,28 @@ void swap_ints(int *xp, int *yp) {
 }
 
 /*Recieves an array of doubles & array of indexes, bubble-sorts both arrays accordingly in-place*/
-void bubble_sort_preserve_indexs(double* values, int* indexes, int array_length) {
-   int i, j;
+void bubble_sort_preserve_indexs(double *values, int *indexes, int array_length) {
+    int i, j;
 
-   for (i = 0; i < array_length-1; i++)      
-       /* Last i elements are already in place */
-       for (j = 0; j < array_length-i-1; j++) 
-           if (values[j] > values[j+1]) {
-              swap_doubles(&values[j], &values[j+1]);
-              swap_ints(&indexes[j], &indexes[j+1]);
-           }
+    for (i = 0; i < array_length - 1; i++)
+        /* Last i elements are already in place */
+        for (j = 0; j < array_length - i - 1; j++)
+            if (values[j] > values[j + 1]) {
+                swap_doubles(&values[j], &values[j + 1]);
+                swap_ints(&indexes[j], &indexes[j + 1]);
+            }
 }
 
 /*Recieve desired array length n, allocate memory and return an indexes-array of same length*/
-int* get_initial_indexes_array (int n) {
-    int* indexes_array;
+int *get_initial_indexes_array(int n) {
+    int *indexes_array;
     int i;
     /*allocate memory*/
-    indexes_array = (int*)malloc(n * sizeof(int));
+    indexes_array = (int *) malloc(n * sizeof(int));
     assert (indexes_array != NULL && "An Error Has Occured");
 
     /*Insert initial indexes values to array*/
-    for (i=0; i < n; i++) {
+    for (i = 0; i < n; i++) {
         indexes_array[i] = i;
     }
 
@@ -687,22 +670,22 @@ int* get_initial_indexes_array (int n) {
 }
 
 /*Receives symmetric matrix and empty array, returns n*n eigenvectors matrix (including memory allocation) and fills array accordingly in-place with corresponding eigenvalues*/
-Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valus_array) {
-    Matrix* current_A_matrix;
-    Matrix* v_matrix;
-    Matrix* temp_v_matrix;
-    Matrix* current_P_matrix;
+Matrix *get_eigen_vectors_and_values(Matrix *originalMatrix, double *eigen_valus_array) {
+    Matrix *current_A_matrix;
+    Matrix *v_matrix;
+    Matrix *temp_v_matrix;
+    Matrix *current_P_matrix;
     double a_current_off, a_previous_off;
     int num_iterations, i, j;
-    double theta,t,c,s;
-    Cell* largest_non_diagonal_cell;
+    double theta, t, c, s;
+    Cell *largest_non_diagonal_cell;
 
-    largest_non_diagonal_cell = (Cell*)malloc(sizeof(Cell));
+    largest_non_diagonal_cell = (Cell *) malloc(sizeof(Cell));
     assert (largest_non_diagonal_cell != NULL && "An Error Has Occured");
     /*Start with input matrix as A*/
     current_A_matrix = originalMatrix;
     /*Initialize V to be identity matrix - agnostic to matrix multiplication*/
-    v_matrix = get_identity_matrix_size_n(originalMatrix -> rows);
+    v_matrix = get_identity_matrix_size_n(originalMatrix->rows);
 
     a_previous_off = MAXIMUM_DOUBLE;
     a_current_off = get_off_diagonal_sum_of_matrix(current_A_matrix);
@@ -711,11 +694,11 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     while ((num_iterations < NUM_ITERATIONS) && (a_previous_off - a_current_off > EPSILON)) {
         /*calculte theta,t,c,s according to formula*/
         get_cell_with_largest_value(current_A_matrix, largest_non_diagonal_cell);
-        i = largest_non_diagonal_cell -> row;
-        j = largest_non_diagonal_cell -> col;
-        theta = (current_A_matrix -> cells[j][j] - current_A_matrix -> cells[i][i]) / (2 * current_A_matrix -> cells[i][j]);
-        t = sign(theta) / (fabs(theta) + sqrt(pow(theta,2) + 1));
-        c = 1 / (sqrt(pow(t,2) + 1));
+        i = largest_non_diagonal_cell->row;
+        j = largest_non_diagonal_cell->col;
+        theta = (current_A_matrix->cells[j][j] - current_A_matrix->cells[i][i]) / (2 * current_A_matrix->cells[i][j]);
+        t = sign(theta) / (fabs(theta) + sqrt(pow(theta, 2) + 1));
+        c = 1 / (sqrt(pow(t, 2) + 1));
         s = t * c;
 
         /*Get P matrix according to c & s*/
@@ -727,10 +710,10 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
 
         free_matrix_memory(temp_v_matrix);
         free_matrix_memory(current_P_matrix);
-        
+
         /*Preform pivot step from A to A' and update Off values*/
         current_A_matrix = preform_pivot_step_and_free_memory(current_A_matrix, i, j, c, s);
-        
+
         a_previous_off = a_current_off;
         a_current_off = get_off_diagonal_sum_of_matrix(current_A_matrix);
 
@@ -740,37 +723,37 @@ Matrix* get_eigen_vectors_and_values (Matrix* originalMatrix, double* eigen_valu
     free(largest_non_diagonal_cell); /*Largest cell data is un-needed from this point, so free the memory space allocated by get_cell_with_largest_value*/
 
     /*Update the eigenValues in array in-place*/
-    for (i=0; i < current_A_matrix -> rows; i++) {
-        eigen_valus_array[i] = current_A_matrix -> cells[i][i];
+    for (i = 0; i < current_A_matrix->rows; i++) {
+        eigen_valus_array[i] = current_A_matrix->cells[i][i];
     }
 
     free_matrix_memory(current_A_matrix);
 
     return v_matrix;
-}   
+}
 
 /*Preform pivot from A to A' according to input A,c,s,i,j and free memory of A*/
-Matrix* preform_pivot_step_and_free_memory (Matrix* A, int i, int j, double c, double s) {
-    Matrix* newA;
+Matrix *preform_pivot_step_and_free_memory(Matrix *A, int i, int j, double c, double s) {
+    Matrix *newA;
     int r;
 
     newA = get_copy_of_matrix(A);
 
     /*iterate only on rows i,j and columns i,j */
-    for (r=0; r < A -> rows; r++) {
+    for (r = 0; r < A->rows; r++) {
         /*Change column i & row i*/
-        newA -> cells[r][i] = (c * A -> cells[r][i]) - (s * A -> cells[r][j]);
-        newA -> cells[i][r] = newA -> cells[r][i];
+        newA->cells[r][i] = (c * A->cells[r][i]) - (s * A->cells[r][j]);
+        newA->cells[i][r] = newA->cells[r][i];
         /*Change column j & row j*/
-        newA -> cells[r][j] = (c * A -> cells[r][j]) + (s *  A -> cells[r][i]);
-        newA -> cells[j][r] = newA -> cells[r][j];
+        newA->cells[r][j] = (c * A->cells[r][j]) + (s * A->cells[r][i]);
+        newA->cells[j][r] = newA->cells[r][j];
     }
 
     /*correct values for A'[i][i], A'[j][j] & A'[i][j]*/
-    newA -> cells[i][i] = (pow(c,2) * A -> cells[i][i]) + (pow(s,2) * A -> cells[j][j]) - (2 * s * c * A -> cells[i][j]);
-    newA -> cells[j][j] = (pow(s,2) * A -> cells[i][i]) + (pow(c,2) * A -> cells[j][j]) + (2 * s * c * A -> cells[i][j]);
-    newA -> cells[i][j] = 0;
-    newA -> cells[j][i] = 0;
+    newA->cells[i][i] = (pow(c, 2) * A->cells[i][i]) + (pow(s, 2) * A->cells[j][j]) - (2 * s * c * A->cells[i][j]);
+    newA->cells[j][j] = (pow(s, 2) * A->cells[i][i]) + (pow(c, 2) * A->cells[j][j]) + (2 * s * c * A->cells[i][j]);
+    newA->cells[i][j] = 0;
+    newA->cells[j][i] = 0;
 
     /*Free memory of original A*/
     free_matrix_memory(A);
@@ -779,14 +762,14 @@ Matrix* preform_pivot_step_and_free_memory (Matrix* A, int i, int j, double c, d
 }
 
 /*Recieves symmetric matrix m and returns sum of squares of all off-diagonal elements*/
-double get_off_diagonal_sum_of_matrix (Matrix* m) {
-    int i,j;
+double get_off_diagonal_sum_of_matrix(Matrix *m) {
+    int i, j;
     double sum = 0.0;
 
     /*calculte sum of squares of all elements above diagonal*/
-    for (i=0; i < m -> rows; i++) {
-        for (j=i+1; j < m -> rows; j++) {
-            sum += pow(m -> cells[i][j], 2);
+    for (i = 0; i < m->rows; i++) {
+        for (j = i + 1; j < m->rows; j++) {
+            sum += pow(m->cells[i][j], 2);
         }
     }
     /*multiply by 2 to get sum of all off-diagonal elements*/
@@ -796,21 +779,21 @@ double get_off_diagonal_sum_of_matrix (Matrix* m) {
 }
 
 /*Recieves symmetric matrix m and returns rotation matrix for m*/
-Matrix* get_rotation_matrix_for_m (Matrix* m, Cell* largest_non_diagonal_cell, double c, double s) {
-    Matrix* rotation_matrix;
-    int i,j;
+Matrix *get_rotation_matrix_for_m(Matrix *m, Cell *largest_non_diagonal_cell, double c, double s) {
+    Matrix *rotation_matrix;
+    int i, j;
 
     /*start with identity matrix*/
-    rotation_matrix = get_identity_matrix_size_n(m -> rows);
+    rotation_matrix = get_identity_matrix_size_n(m->rows);
 
-    i = largest_non_diagonal_cell -> row;
-    j = largest_non_diagonal_cell -> col;
-    
+    i = largest_non_diagonal_cell->row;
+    j = largest_non_diagonal_cell->col;
+
     /*set correlating cells to c, s  & -s*/
-    rotation_matrix -> cells[i][i] = c;
-    rotation_matrix -> cells[i][j] = s;
-    rotation_matrix -> cells[j][j] = c;
-    rotation_matrix -> cells[j][i] = s*(-1);
+    rotation_matrix->cells[i][i] = c;
+    rotation_matrix->cells[i][j] = s;
+    rotation_matrix->cells[j][j] = c;
+    rotation_matrix->cells[j][i] = s * (-1);
 
     return rotation_matrix;
 }
@@ -819,19 +802,19 @@ Matrix* get_rotation_matrix_for_m (Matrix* m, Cell* largest_non_diagonal_cell, d
 /*** SPK FUNCTIONS ***/
 /*******************************/
 /*Receives matrix and k value, preforms spectral clustering accordingly and prints the result*/
-void run_spk(Matrix * points, int k) {
+void run_spk(Matrix *points, int k) {
     /***Variables declarations***/
     double *point;
     Cluster **clusters;
     int did_update;
-    int i,j;
+    int i, j;
 
     /***Execute k-means algorithm***/
     clusters = init_k_clusters(points, k);
     did_update = 0;
 
-    for (i=0; i<MAX_ITER; i++) {
-        for (j=0; j<points->rows; j++) {
+    for (i = 0; i < MAX_ITER; i++) {
+        for (j = 0; j < points->rows; j++) {
             point = points->cells[j];
             find_minimum_distance(clusters, point, k, points->cols);
         }
@@ -841,19 +824,17 @@ void run_spk(Matrix * points, int k) {
         }
     }
     /***Print results***/
-    for (i=0; i<k; i++) {
-        for (j=0; j<points->cols-1; j++) {      
+    for (i = 0; i < k; i++) {
+        for (j = 0; j < points->cols - 1; j++) {
             if (clusters[i]->curr_centroids[j] > -0.00005 && clusters[i]->curr_centroids[j] < 0.0) {
                 printf("%.4f,", clusters[i]->curr_centroids[j] * (-1));
-            }
-            else {
+            } else {
                 printf("%.4f,", clusters[i]->curr_centroids[j]);
             }
         }
         if (clusters[i]->curr_centroids[j] > -0.00005 && clusters[i]->curr_centroids[j] < 0.0) {
             printf("%.4f\n", clusters[i]->curr_centroids[j] * (-1));
-        }
-        else {
+        } else {
             printf("%.4f\n", clusters[i]->curr_centroids[j]);
         }
     }
@@ -861,19 +842,23 @@ void run_spk(Matrix * points, int k) {
     free_clusters_memory(clusters, k);
 }
 
-double** init_points (int num_points, int num_coordinates) {
-     /*
-    Recieves number of points and number of coordinates,
-    Returns new 2D array of points with sufficient memory to store all points.
-    */
-    double** points;
+/*******************************/
+/*** SPK & kmeans++ FUNCTIONS ***/
+/*******************************/
+
+double **init_points(int num_points, int num_coordinates) {
+    /*
+   Recieves number of points and number of coordinates,
+   Returns new 2D array of points with sufficient memory to store all points.
+   */
+    double **points;
     int i;
 
     /*allocate memory for 2D array of points*/
-    points = (double**)malloc(sizeof(double*) * num_points);
+    points = (double **) malloc(sizeof(double *) * num_points);
     assert(points != NULL && "An Error Has Occured");
-    for (i=0; i< num_points; i++) {
-        points[i] = (double*)malloc(sizeof(double) * num_coordinates);
+    for (i = 0; i < num_points; i++) {
+        points[i] = (double *) malloc(sizeof(double) * num_coordinates);
         assert(points[i] != NULL && "An Error Has Occured");
     }
 
@@ -881,13 +866,13 @@ double** init_points (int num_points, int num_coordinates) {
 }
 
 
-double* convert_line_to_point (double* point, char* line) {
-     /*
-    Recieves pointer to char array containing a line (=point) and pointer to initialized double-array (=point),
-    Returns the same point after filling it with double values from the line, using string.h functio strtok.
-    Reference: https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
-    */
-    char* tokens;
+double *convert_line_to_point(double *point, char *line) {
+    /*
+   Recieves pointer to char array containing a line (=point) and pointer to initialized double-array (=point),
+   Returns the same point after filling it with double values from the line, using string.h functio strtok.
+   Reference: https://www.tutorialspoint.com/c_standard_library/c_function_strtok.htm
+   */
+    char *tokens;
     int index;
 
     index = 0;
@@ -904,14 +889,13 @@ double* convert_line_to_point (double* point, char* line) {
 }
 
 
-
-Cluster* make_cluster (const double* point, const int num_coordinates,const int index) {
+Cluster *make_cluster(const double *point, const int num_coordinates, const int index) {
     /*
     Recieves a point, number of coordinates and a specific cluster index,
     Returns new Cluster with sufficient memory space to store both the current centroid and the previous centroid.
     */
     int i;
-    Cluster* cluster;
+    Cluster *cluster;
 
     /*allocate memory*/
     cluster = malloc(sizeof(Cluster));
@@ -920,22 +904,22 @@ Cluster* make_cluster (const double* point, const int num_coordinates,const int 
     cluster->cluster_size = 0;
     cluster->cluster_index = index;
     /*initialize centroids*/
-    cluster->curr_centroids = (double*)malloc(sizeof(double) * num_coordinates);
+    cluster->curr_centroids = (double *) malloc(sizeof(double) * num_coordinates);
     assert (cluster->curr_centroids != NULL && "An Error Has Occured");
-    cluster->prev_centroids = (double*)malloc(sizeof(double) * num_coordinates);
+    cluster->prev_centroids = (double *) malloc(sizeof(double) * num_coordinates);
     assert (cluster->prev_centroids != NULL && "An Error Has Occured");
-    cluster->sum = (double*)malloc(sizeof(double) * num_coordinates);
+    cluster->sum = (double *) malloc(sizeof(double) * num_coordinates);
     assert (cluster->sum != NULL && "An Error Has Occured");
 
-    for (i=0; i<num_coordinates; i++) {
+    for (i = 0; i < num_coordinates; i++) {
         cluster->curr_centroids[i] = point[i];
-        cluster->sum [i] = 0;
+        cluster->sum[i] = 0;
     }
 
     return cluster;
 }
 
-void add_point_to_cluster (Cluster* cluster,const double* point, int num_coordinates) {
+void add_point_to_cluster(Cluster *cluster, const double *point, int num_coordinates) {
     /*
     Recieves pointer to a Cluster, a point and number of coordinates,
     Adds the given point to the given cluster.
@@ -943,12 +927,12 @@ void add_point_to_cluster (Cluster* cluster,const double* point, int num_coordin
     int i;
 
     cluster->cluster_size += 1;
-    for (i=0; i<num_coordinates; i++) {
+    for (i = 0; i < num_coordinates; i++) {
         cluster->sum[i] += point[i];
     }
 }
 
-void find_minimum_distance (Cluster** clusters, double* point, int k, int num_coordinates) {
+void find_minimum_distance(Cluster **clusters, double *point, int k, int num_coordinates) {
     /*
     Recieves 2D Clsuter array, pointer to a point, k and number of coordinates,
     Checks which centroid is closest to the given point,
@@ -963,7 +947,7 @@ void find_minimum_distance (Cluster** clusters, double* point, int k, int num_co
     distance_min = 1.7976931348623155e+308;
     index_min = -1;
 
-    for (i=0; i<k; i++) {
+    for (i = 0; i < k; i++) {
         current_distance = get_distance(clusters[i], point, num_coordinates);
         if (current_distance < distance_min) {
             distance_min = current_distance;
@@ -974,8 +958,7 @@ void find_minimum_distance (Cluster** clusters, double* point, int k, int num_co
     add_point_to_cluster(clusters[index_min], point, num_coordinates);
 }
 
-
-double update_cluster_centroids_and_sum (Cluster* cluster, int num_coordinates) {
+double update_cluster_centroids_and_sum(Cluster *cluster, int num_coordinates) {
     /*
     Recieves pointer to a changed cluster and number of coordinates,
     Updates cluster accordingly,
@@ -984,7 +967,7 @@ double update_cluster_centroids_and_sum (Cluster* cluster, int num_coordinates) 
     int i;
     double distance;
 
-    for (i=0; i<num_coordinates; i++) {
+    for (i = 0; i < num_coordinates; i++) {
         cluster->prev_centroids[i] = cluster->curr_centroids[i];
         cluster->curr_centroids[i] = cluster->sum[i] / cluster->cluster_size;
         cluster->sum[i] = 0;
@@ -995,7 +978,7 @@ double update_cluster_centroids_and_sum (Cluster* cluster, int num_coordinates) 
     return distance;
 }
 
-int update_all_clusters (Cluster** clusters, int k, int num_coordinates) {
+int update_all_clusters(Cluster **clusters, int k, int num_coordinates) {
     /*
     Recieves 2D array of clusters, k and number of coordinates,
     Upadates all clusters using update_cluster_centroids_and_sum while counting total change in distance,
@@ -1006,8 +989,8 @@ int update_all_clusters (Cluster** clusters, int k, int num_coordinates) {
 
     total_update = 0.0;
 
-    for (i=0; i<k; i++) {
-        total_update += update_cluster_centroids_and_sum (clusters[i], num_coordinates);
+    for (i = 0; i < k; i++) {
+        total_update += update_cluster_centroids_and_sum(clusters[i], num_coordinates);
     }
 
     if (total_update < KMEANS_EPSILON) {
@@ -1017,15 +1000,15 @@ int update_all_clusters (Cluster** clusters, int k, int num_coordinates) {
     return 0;
 }
 
-void free_clusters_memory (Cluster** clusters, int k) {
+void free_clusters_memory(Cluster **clusters, int k) {
     /*
     Recieves 2D array of clusters and k,
     Frees up memory used by all clusters.
     */
     int i;
-    Cluster* curr_cluster;
+    Cluster *curr_cluster;
 
-    for (i=0; i<k; i++) {
+    for (i = 0; i < k; i++) {
         curr_cluster = clusters[i];
         if (curr_cluster != NULL) {
             free(curr_cluster->curr_centroids);
@@ -1036,20 +1019,20 @@ void free_clusters_memory (Cluster** clusters, int k) {
     }
 }
 
-void free_points_memory (double** points, int num_points) {
+void free_points_memory(double **points, int num_points) {
     /*
     Recieves 2D array of pounts and number of points,
     Frees up memory used by all points.
     */
     int i;
 
-    for (i=0; i<num_points; i++) {
+    for (i = 0; i < num_points; i++) {
         free(points[i]);
     }
 }
 
 
-double get_distance (Cluster* cluster, const double* point, int num_coordinates) {
+double get_distance(Cluster *cluster, const double *point, int num_coordinates) {
     /*
     Recieves pointer to cluster, pointer to point and number of coordinates,
     Returns euclidean distance of point from cluster.
@@ -1059,22 +1042,22 @@ double get_distance (Cluster* cluster, const double* point, int num_coordinates)
     int i;
 
     distance = 0;
-    for (i=0; i<num_coordinates; i++) {
+    for (i = 0; i < num_coordinates; i++) {
         toAdd = (cluster->curr_centroids[i] - point[i]);
-        distance += (toAdd*toAdd);
+        distance += (toAdd * toAdd);
     }
     return distance;
 }
 
 /*Recieves pointer to 2D array of points, k and number of coordinates,Returns new 2D array of Clusters with sufficient memory, initialized with the first k points.*/
-Cluster** init_k_clusters (Matrix * points, int k) {
+Cluster **init_k_clusters(Matrix *points, int k) {
     Cluster **clusters;
     int i;
 
-    clusters = malloc(sizeof(Cluster*) * k);
+    clusters = malloc(sizeof(Cluster *) * k);
     assert (clusters != NULL && "An Error Has Occured");
 
-    for (i=0; i<k; i++) {
+    for (i = 0; i < k; i++) {
         clusters[i] = make_cluster(points->cells[i], points->cols, i);
     }
 

@@ -41,9 +41,11 @@ typedef struct CellStruct {
 /**FUNCTION DECLARATION**/
 /**********************/
 
+/*** Main ***/
 int main(int argc, char **argv);
 void run_functions_according_to_goal(char * goal, Matrix * points_matrix, int k);
-/***UTILS***/
+
+/*** UTILS ***/
 Matrix* get_points_matrix (char *path);
 Matrix* get_matrix_from_2D_array (double** points, int num_points, int num_coordinates);
 void print_matrix (Matrix* m);
@@ -53,7 +55,6 @@ Matrix* get_zeros_matrix_size_n (int n);
 Matrix* get_n_k_zero_matrix (int n, int k);
 Matrix* get_identity_matrix_size_n (int n);
 void get_cell_with_largest_value (Matrix* m, Cell* cell_pointer);
-int is_diagonal_matrix (Matrix* m);
 double sign (double num);
 void multiply_matrices_to_existing_pointer (Matrix* m1, Matrix* m2, Matrix* product);
 void free_matrix_memory (Matrix* m);
@@ -63,14 +64,18 @@ int get_num_points(FILE *fptr);
 int get_num_coordinates(FILE *fptr);
 void get_points_from_file (FILE *fptr, double** points);
 void single_line_to_point (double* point, char* single_line);
+
 /*** WAM ***/
 Matrix * run_wam(Matrix * points);
 double calculate_weight(double * point1, double * point2, int num_coordinates);
+
 /*** DDG ***/
 Matrix * run_ddg(Matrix * wam);
 void convert_ddg_with_the_pow_of_minus_half(Matrix * ddg_matrix);
+
 /*** LNORM ***/
 Matrix * run_lnorm(Matrix * wam, Matrix * ddg);
+
 /*** JACOBI ***/
 Matrix* run_jacobi (Matrix* lnorm, char* goal);
 void get_column_by_index(Matrix* m1, Matrix* m2, int m1_index, int m2_index, int column_size);
@@ -83,8 +88,11 @@ Matrix* get_eigen_vectors_and_values (Matrix* original_matrix, double* eigen_val
 Matrix* preform_pivot_step_and_free_memory (Matrix* A, int i, int j, double c, double s);
 double get_off_diagonal_sum_of_matrix (Matrix* m);
 Matrix* get_rotation_matrix_for_m (Matrix* m, Cell* largest_non_diagonal_cell, double c, double s);
+
 /*** SPK ***/
 void run_spk(Matrix * points, int k);
+
+/*** SPK & kmeans++ functions ***/
 Cluster** init_k_clusters (Matrix * points, int k);
 double** init_points (int num_points, int num_coordinates);
 double* convert_line_to_point (double* point, char* line);
