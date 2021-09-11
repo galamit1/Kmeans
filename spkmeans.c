@@ -1054,7 +1054,7 @@ Cluster **init_k_clusters(Matrix *points, int k) {
     Cluster **clusters;
     int i;
 
-    clusters = malloc(sizeof(Cluster *) * k);
+    clusters = (Cluster**)malloc(sizeof(Cluster *) * k);
     assert (clusters != NULL && "An Error Has Occured");
 
     for (i = 0; i < k; i++) {
