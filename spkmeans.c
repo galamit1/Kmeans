@@ -898,7 +898,7 @@ Cluster *make_cluster(const double *point, const int num_coordinates, const int 
     Cluster *cluster;
 
     /*allocate memory*/
-    cluster = malloc(sizeof(Cluster));
+    cluster = (Cluster*)malloc(sizeof(Cluster));
     assert (cluster != NULL && "An Error Has Occured");
     /*initialize parameters*/
     cluster->cluster_size = 0;
