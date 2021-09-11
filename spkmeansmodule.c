@@ -3,8 +3,9 @@
 #include "spkmeans.h"
 
 /*** Function Declaration ***/
-static PyObject *c_kmeans(PyObject *self, PyObject *args);
+static PyObject *c_spkmeans(PyObject *self, PyObject *args);
 static PyObject *c_spk(PyObject *self, PyObject *args);
+static PyObject *c_get_t_matrix(PyObject *self, PyObject *args);
 int python_list_of_lists_to_2D_array(PyObject *python_list_of_lists, double **target_array);
 Cluster **python_init_k_clusters(int k);
 PyMODINIT_FUNC PyInit_myspkmeans(void);
@@ -16,7 +17,6 @@ PyMODINIT_FUNC PyInit_myspkmeans(void);
 
 static PyObject *c_spkmeans(PyObject *self, PyObject *args) {
     /*Define variables to receive from user*/
-    int max_iter = 300;
     char *goal;
     int num_points;
     int num_coordinates;
@@ -165,7 +165,6 @@ static PyObject *c_get_t_matrix(PyObject *self, PyObject *args) {
     int num_coordinates;
     PyObject *data_points;
     double **points;
-    double *point;
     int i;
     int j;
     Py_ssize_t output_list_len;
