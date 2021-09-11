@@ -103,5 +103,6 @@ int update_all_clusters (Cluster** clusters, int k, int num_coordinates);
 void free_clusters_memory (Cluster** clusters, int k);
 void free_points_memory (double** points, int num_points);
 double get_distance (Cluster* cluster, const double* point, int num_coordinates);
+Cluster **python_init_k_clusters(int k);
 
 #endif

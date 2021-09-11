@@ -1,13 +1,17 @@
 #define PY_SSIZE_T_CLEAN
+
 #include <Python.h>
 #include "spkmeans.h"
 
 /*** Function Declaration ***/
 static PyObject *c_spkmeans(PyObject *self, PyObject *args);
+
 static PyObject *c_spk(PyObject *self, PyObject *args);
+
 static PyObject *c_get_t_matrix(PyObject *self, PyObject *args);
+
 int python_list_of_lists_to_2D_array(PyObject *python_list_of_lists, double **target_array);
-Cluster **python_init_k_clusters(int k);
+
 PyMODINIT_FUNC PyInit_myspkmeans(void);
 
 
@@ -157,6 +161,10 @@ static PyObject *c_spk(PyObject *self, PyObject *args) {
 
     return centroids_output_list;
 }
+
+/*******************************/
+/*** calculate t matrix from points ***/
+/*******************************/
 
 static PyObject *c_get_t_matrix(PyObject *self, PyObject *args) {
     /*Define variables to receive from user*/
@@ -310,17 +318,4 @@ int python_list_of_lists_to_2D_array(PyObject *python_list_of_lists, double **ta
         }
     }
     return 0;
-}
-
-Cluster **python_init_k_clusters(int k) {
-    /*
-    Recieves pointer to 2D array of points, k, number of coordinates and 2D array of initial indexes,
-    Returns new 2D array of Clusters with sufficient memory, initialized with the first k points.
-    */
-    Cluster **clusters;
-
-    clusters = malloc(sizeof(Cluster *) * k);
-    assert (clusters != NULL);
-
-    return clusters;
 }

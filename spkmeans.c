@@ -898,7 +898,7 @@ Cluster *make_cluster(const double *point, const int num_coordinates, const int 
     Cluster *cluster;
 
     /*allocate memory*/
-    cluster = (Cluster*)malloc(sizeof(Cluster));
+    cluster = (Cluster *) malloc(sizeof(Cluster));
     assert (cluster != NULL && "An Error Has Occured");
     /*initialize parameters*/
     cluster->cluster_size = 0;
@@ -1017,6 +1017,9 @@ void free_clusters_memory(Cluster **clusters, int k) {
             free(curr_cluster);
         }
     }
+    if (clusters != NULL) {
+        free(clusters);
+    }
 }
 
 void free_points_memory(double **points, int num_points) {
@@ -1054,12 +1057,26 @@ Cluster **init_k_clusters(Matrix *points, int k) {
     Cluster **clusters;
     int i;
 
-    clusters = (Cluster**)malloc(sizeof(Cluster *) * k);
+    clusters = (Cluster **) malloc(sizeof(Cluster *) * k);
     assert (clusters != NULL && "An Error Has Occured");
 
     for (i = 0; i < k; i++) {
         clusters[i] = make_cluster(points->cells[i], points->cols, i);
     }
+
+    return clusters;
+}
+
+/* usage in spkmeansmodule */
+Cluster **python_init_k_clusters(int k) {
+    /*
+    Recieves pointer to 2D array of points, k, number of coordinates and 2D array of initial indexes,
+    Returns new 2D array of Clusters with sufficient memory, initialized with the first k points.
+    */
+    Cluster **clusters;
+
+    clusters = malloc(sizeof(Cluster *) * k);
+    assert (clusters != NULL);
 
     return clusters;
 }
