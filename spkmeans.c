@@ -80,7 +80,7 @@ void run_functions_according_to_goal(char *goal, Matrix *points_matrix, int k) {
     }
     if (strcmp(goal, "jacobi") == 0) {
         run = 1;
-        U_matrix = run_jacobi(points_matrix, goal);
+        U_matrix = run_jacobi(points_matrix, goal, k);
 
         free_matrix_memory(U_matrix);
     }
@@ -90,7 +90,7 @@ void run_functions_according_to_goal(char *goal, Matrix *points_matrix, int k) {
         ddg_matrix = run_ddg(wam_matrix);
         convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
         lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-        U_matrix = run_jacobi(lnorm_matrix, goal);
+        U_matrix = run_jacobi(lnorm_matrix, goal, k);
         T_matrix = normalize_matrix(U_matrix);
 
         if (k == 0) {
@@ -543,15 +543,15 @@ Matrix *run_lnorm(Matrix *wam, Matrix *ddg) {
 /*** JACOBI FUNCTIONS ***/
 /*******************************/
 /*Recieves lnorm symmetric matrix, runs jacobi algorithm and returns n*k matrix U  containing the first k eigenvectors u1, . . . , uk of Lnorm columns. K is inferred by matrix size*/
-Matrix *run_jacobi(Matrix *lnorm, char *goal) {
+Matrix *run_jacobi(Matrix *lnorm, char *goal, int k) {
     Matrix *eigen_vectors_matrix;
     Matrix *final_U_matrix;
     Matrix *lnorm_copy;
     double *eigen_values_array;
     int *indexes_array;
     int n;
-    int k;
     int i;
+    int new_k;
 
     n = lnorm->rows;
     /*allocate memory for eigenvalues array*/
@@ -572,7 +572,10 @@ Matrix *run_jacobi(Matrix *lnorm, char *goal) {
     /*get initial indexes array i.e. [0,1,...,n-1] */
     indexes_array = get_initial_indexes_array(n);
     /*get eigengap k and preserve original indexes during sort*/
-    k = get_eigen_gap_k(eigen_values_array, indexes_array, n);
+    new_k = get_eigen_gap_k(eigen_values_array, indexes_array, n);
+    if (k==0) {
+        k = new_k;
+    }
     /*allocate memory for U - a n*k Matrix*/
     final_U_matrix = get_n_k_zero_matrix(n, k);
 

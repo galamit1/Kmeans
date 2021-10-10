@@ -213,7 +213,7 @@ static PyObject *c_get_t_matrix(PyObject *self, PyObject *args) {
     ddg_matrix = run_ddg(wam_matrix);
     convert_ddg_with_the_pow_of_minus_half(ddg_matrix);
     lnorm_matrix = run_lnorm(wam_matrix, ddg_matrix);
-    U_matrix = run_jacobi(lnorm_matrix, "spk");
+    U_matrix = run_jacobi(lnorm_matrix, "spk", k);
     T_matrix = normalize_matrix(U_matrix);
 
     free_matrix_memory(wam_matrix);

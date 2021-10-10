@@ -76,7 +76,7 @@ void convert_ddg_with_the_pow_of_minus_half(Matrix * ddg_matrix);
 Matrix * run_lnorm(Matrix * wam, Matrix * ddg);
 
 /*** JACOBI ***/
-Matrix* run_jacobi (Matrix* lnorm, char* goal);
+Matrix* run_jacobi (Matrix* lnorm, char* goal, int k);
 void get_column_by_index(Matrix* m1, Matrix* m2, int m1_index, int m2_index, int column_size);
 int get_eigen_gap_k (double* eigen_valus_array, int* indexes_array, int array_length);
 void swap_doubles(double *xp, double *yp);
