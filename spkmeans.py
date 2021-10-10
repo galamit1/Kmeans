@@ -15,9 +15,9 @@ def get_arguments():
     file_name = sys.argv[3]
     with open(file_name, 'r') as f:
         data = f.read()
-    points = [[float(num.strip()) for num in row.split(COORDINATES_SEPARATOR)] for row in data.split(POINTS_SEPARATOR)]
+    rows = [row for row in data.split(POINTS_SEPARATOR) if row != ""]
+    points = [[float(num.strip()) for num in row.split(COORDINATES_SEPARATOR)] for row in rows]
     return k, goal, points
-
 
 def run_spk(points, k):
     if k >= len(points):
